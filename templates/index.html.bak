@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ANIKU — Nonton Anime Tanpa Batas</title>
+  <meta name="description" content="Aniku adalah aplikasi streaming anime Android gratis. Tonton ribuan anime sub Indonesia kapan saja, di mana saja." />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ember:   '#E84B1A',
+            lava:    '#C0391A',
+            coal:    '#0E0A09',
+            ash:     '#1A1210',
+            smoke:   '#2B1E1A',
+            bone:    '#F0EAE6',
+            dim:     '#9E8A82',
+          },
+          fontFamily: {
+            display: ['"Bebas Neue"', 'sans-serif'],
+            body:    ['"Inter"', 'sans-serif'],
+          },
+          backgroundImage: {
+            'radial-fire': 'radial-gradient(ellipse at 50% 0%, rgba(232,75,26,0.25) 0%, rgba(14,10,9,0) 70%)',
+            'ember-glow':  'radial-gradient(circle at 50% 50%, rgba(232,75,26,0.15) 0%, transparent 70%)',
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float':      'float 6s ease-in-out infinite',
+            'glow':       'glow 3s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%':      { transform: 'translateY(-12px)' },
+            },
+            glow: {
+              '0%, 100%': { boxShadow: '0 0 20px rgba(232,75,26,0.4), 0 0 60px rgba(232,75,26,0.1)' },
+              '50%':      { boxShadow: '0 0 40px rgba(232,75,26,0.7), 0 0 100px rgba(232,75,26,0.2)' },
+            },
+          },
+        }
+      }
+    }
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background-color: #0E0A09; }
+
+    /* Ember particle effect */
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #E84B1A;
+      animation: rise linear infinite;
+      opacity: 0;
+    }
+    @keyframes rise {
+      0%   { transform: translateY(0) scale(1); opacity: 0.8; }
+      100% { transform: translateY(-200px) scale(0); opacity: 0; }
+    }
+
+    /* Icon glow ring */
+    .icon-ring::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 28%;
+      background: conic-gradient(from 0deg, #E84B1A, #FF6B35, #C0391A, #E84B1A);
+      animation: spin 8s linear infinite;
+      z-index: -1;
+      opacity: 0.6;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Feature card hover */
+    .feat-card {
+      background: linear-gradient(135deg, rgba(43,30,26,0.8) 0%, rgba(26,18,16,0.9) 100%);
+      border: 1px solid rgba(232,75,26,0.15);
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .feat-card:hover {
+      border-color: rgba(232,75,26,0.5);
+      transform: translateY(-4px);
+    }
+
+    /* Screenshot mockup */
+    .phone-frame {
+      background: linear-gradient(160deg, #2B1E1A, #1A1210);
+      border: 1.5px solid rgba(232,75,26,0.3);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 40px rgba(232,75,26,0.08);
+    }
+
+    /* Download button */
+    .dl-btn {
+      background: linear-gradient(135deg, #E84B1A 0%, #C0391A 100%);
+      box-shadow: 0 4px 30px rgba(232,75,26,0.4);
+      transition: all 0.25s;
+    }
+    .dl-btn:hover {
+      transform: scale(1.04);
+      box-shadow: 0 6px 40px rgba(232,75,26,0.6);
+    }
+    .dl-btn:active { transform: scale(0.98); }
+
+    /* Section divider */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(232,75,26,0.4), transparent);
+    }
+
+    /* Feature icon box */
+    .feat-icon {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(232,75,26,0.12);
+      border: 1px solid rgba(232,75,26,0.25);
+      color: #E84B1A;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+
+<body class="font-body text-bone overflow-x-hidden">
+
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
+       style="background: linear-gradient(to bottom, rgba(14,10,9,0.95), transparent); backdrop-filter: blur(8px);">
+    <div class="flex items-center gap-2">
+      <img src="{{ url_for('static', filename='img/icon.png') }}" alt="Aniku" class="w-8 h-8 rounded-xl" />
+      <span class="font-display text-2xl tracking-widest text-bone">ANIKU</span>
+    </div>
+    <a href="#download"
+       class="dl-btn text-white font-semibold text-sm px-5 py-2 rounded-full">
+      Download APK
+    </a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-16 overflow-hidden">
+
+    <!-- Background radial glow -->
+    <div class="absolute inset-0 bg-radial-fire pointer-events-none"></div>
+
+    <!-- Ember particles -->
+    <div id="particles" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+
+    <!-- App Icon -->
+    <div class="relative animate-float mb-8">
+      <div class="icon-ring relative w-32 h-32 md:w-40 md:h-40 rounded-[28%] overflow-hidden animate-glow">
+        <img src="{{ url_for('static', filename='img/icon.png') }}"
+             alt="Aniku App Icon"
+             class="w-full h-full object-cover" />
+      </div>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="font-display text-center text-6xl md:text-8xl lg:text-9xl tracking-widest leading-none mb-4">
+      <span class="text-bone">NONTON</span><br />
+      <span class="text-ember">ANIME</span><br />
+      <span class="text-bone">GRATIS</span>
+    </h1>
+
+    <p class="text-center text-dim text-base md:text-lg max-w-sm mt-4 mb-10 leading-relaxed">
+      Ribuan judul anime sub Indonesia. Tanpa iklan mengganggu. Langsung di genggamanmu.
+    </p>
+
+    <!-- CTA -->
+    <a id="download"
+       href="https://github.com/RMBLOGG/aniku-app/releases/download/v1.0.0/Aniku.apk"
+       class="dl-btn flex items-center gap-3 text-white font-semibold text-lg px-8 py-4 rounded-2xl"
+       download>
+      <i class="fa-brands fa-android text-xl"></i>
+      Download APK &nbsp;·&nbsp; v1.0.0
+    </a>
+
+    <p class="text-dim text-xs mt-4">Android 6.0+ &nbsp;·&nbsp; ~15 MB &nbsp;·&nbsp; Gratis</p>
+
+    <!-- Scroll cue -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-40 animate-bounce">
+      <div class="w-px h-8 bg-ember"></div>
+      <i class="fa-solid fa-chevron-down text-ember text-sm"></i>
+    </div>
+  </section>
+
+  <div class="divider mx-6"></div>
+
+  <!-- FEATURES -->
+  <section class="px-6 py-20 max-w-5xl mx-auto">
+    <p class="font-display text-center text-4xl md:text-5xl tracking-widest text-bone mb-3">KENAPA ANIKU?</p>
+    <p class="text-center text-dim text-sm mb-14">Semua yang kamu butuhkan untuk marathon anime.</p>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+
+      <div class="feat-card rounded-2xl p-5">
+        <div class="text-ember text-2xl mb-3"><i class="fa-solid fa-play"></i></div>
+        <h3 class="font-semibold text-bone text-base mb-1">Streaming Langsung</h3>
+        <p class="text-dim text-sm leading-relaxed">Tonton episode terbaru tanpa perlu download manual.</p>
+      </div>
+
+      <div class="feat-card rounded-2xl p-5">
+        <div class="text-ember text-2xl mb-3"><i class="fa-solid fa-bookmark"></i></div>
+        <h3 class="font-semibold text-bone text-base mb-1">Bookmark</h3>
+        <p class="text-dim text-sm leading-relaxed">Simpan anime favoritmu, lanjutkan kapan saja.</p>
+      </div>
+
+      <div class="feat-card rounded-2xl p-5">
+        <div class="text-ember text-2xl mb-3"><i class="fa-solid fa-calendar-days"></i></div>
+        <h3 class="font-semibold text-bone text-base mb-1">Jadwal Tayang</h3>
+        <p class="text-dim text-sm leading-relaxed">Lihat anime yang tayang hari ini sesuai hari rilis.</p>
+      </div>
+
+      <div class="feat-card rounded-2xl p-5">
+        <div class="text-ember text-2xl mb-3"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <h3 class="font-semibold text-bone text-base mb-1">Cari & Filter Genre</h3>
+        <p class="text-dim text-sm leading-relaxed">Temukan anime berdasarkan genre atau judul dengan cepat.</p>
+      </div>
+
+      <div class="feat-card rounded-2xl p-5">
+        <div class="text-ember text-2xl mb-3"><i class="fa-solid fa-user"></i></div>
+        <h3 class="font-semibold text-bone text-base mb-1">Akun Gratis</h3>
+        <p class="text-dim text-sm leading-relaxed">Daftar dengan email, sinkronisasi bookmark antar perangkat.</p>
+      </div>
+
+      <div class="feat-card rounded-2xl p-5">
+        <div class="text-ember text-2xl mb-3"><i class="fa-solid fa-circle-half-stroke"></i></div>
+        <h3 class="font-semibold text-bone text-base mb-1">Dark & Light Mode</h3>
+        <p class="text-dim text-sm leading-relaxed">Tema sesuai selera, mata tetap nyaman marathon malam.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider mx-6"></div>
+
+  <!-- SCREENSHOT PREVIEW SECTION -->
+  <section class="px-6 py-20 max-w-5xl mx-auto">
+    <p class="font-display text-center text-4xl md:text-5xl tracking-widest text-bone mb-3">TAMPILAN APLIKASI</p>
+    <p class="text-center text-dim text-sm mb-16">Langsung dari HP — bukan mockup buatan.</p>
+
+    <div class="flex flex-col md:flex-row items-center gap-12 md:gap-16">
+
+      <!-- Phone screenshot -->
+      <div class="shrink-0 flex justify-center">
+        <div class="relative">
+          <!-- Glow behind phone -->
+          <div class="absolute inset-0 rounded-[40px] blur-2xl opacity-30"
+               style="background:radial-gradient(ellipse, #E84B1A 0%, transparent 70%);transform:scale(0.85) translateY(10%);"></div>
+          <!-- Actual screenshot -->
+          <img src="{{ url_for('static', filename='img/ss1.png') }}"
+               alt="Screenshot Aniku — Home Screen"
+               class="relative w-56 md:w-64 drop-shadow-2xl"
+               style="filter: drop-shadow(0 20px 60px rgba(0,0,0,0.8)) drop-shadow(0 0 30px rgba(232,75,26,0.15));" />
+        </div>
+      </div>
+
+      <!-- Feature highlights dari SS -->
+      <div class="flex-1 flex flex-col gap-6">
+
+        <div class="flex items-start gap-4">
+          <div class="feat-icon"><i class="fa-solid fa-play"></i></div>
+          <div>
+            <p class="font-semibold text-bone text-sm mb-1">Hero Banner dengan Judul Featured</p>
+            <p class="text-dim text-xs leading-relaxed">Anime pilihan tampil besar di atas, langsung bisa ditonton atau di-bookmark.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4">
+          <div class="feat-icon"><i class="fa-solid fa-fire"></i></div>
+          <div>
+            <p class="font-semibold text-bone text-sm mb-1">Sedang Tayang & Terbaru</p>
+            <p class="text-dim text-xs leading-relaxed">Kartu anime dengan info episode, rating, dan tombol bookmark langsung dari home.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4">
+          <div class="feat-icon"><i class="fa-solid fa-compass"></i></div>
+          <div>
+            <p class="font-semibold text-bone text-sm mb-1">Navigasi 5 Tab</p>
+            <p class="text-dim text-xs leading-relaxed">Home · Cari · Eksplor · Bookmark · Jadwal — semua dalam satu bottom bar.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-4">
+          <div class="feat-icon"><i class="fa-solid fa-moon"></i></div>
+          <div>
+            <p class="font-semibold text-bone text-sm mb-1">Dark Mode Native</p>
+            <p class="text-dim text-xs leading-relaxed">UI gelap penuh, nyaman buat marathon tengah malam tanpa silau.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider mx-6"></div>
+
+  <!-- CARA INSTALL -->
+  <section class="px-6 py-20 max-w-3xl mx-auto">
+    <p class="font-display text-center text-4xl md:text-5xl tracking-widest text-bone mb-12">CARA INSTALL</p>
+    <div class="flex flex-col gap-6">
+
+      <div class="flex items-start gap-5">
+        <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-ember font-display text-xl"
+             style="background:rgba(232,75,26,0.12);border:1px solid rgba(232,75,26,0.3);">1</div>
+        <div>
+          <p class="font-semibold text-bone mb-1">Download APK</p>
+          <p class="text-dim text-sm">Klik tombol download di halaman ini. File Aniku.apk akan tersimpan otomatis.</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-5">
+        <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-ember font-display text-xl"
+             style="background:rgba(232,75,26,0.12);border:1px solid rgba(232,75,26,0.3);">2</div>
+        <div>
+          <p class="font-semibold text-bone mb-1">Aktifkan "Install dari Sumber Tidak Dikenal"</p>
+          <p class="text-dim text-sm">Buka Pengaturan → Keamanan → aktifkan izin install APK dari sumber luar Play Store.</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-5">
+        <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-ember font-display text-xl"
+             style="background:rgba(232,75,26,0.12);border:1px solid rgba(232,75,26,0.3);">3</div>
+        <div>
+          <p class="font-semibold text-bone mb-1">Buka File APK & Install</p>
+          <p class="text-dim text-sm">Buka file manager, ketuk Aniku.apk, lalu tap Install. Prosesnya hanya beberapa detik.</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-5">
+        <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-ember font-display text-xl"
+             style="background:rgba(232,75,26,0.12);border:1px solid rgba(232,75,26,0.3);">4</div>
+        <div>
+          <p class="font-semibold text-bone mb-1">Buka & Nikmati!</p>
+          <p class="text-dim text-sm">Daftar akun gratis atau langsung browse ribuan anime sub Indonesia.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider mx-6"></div>
+
+  <!-- FINAL CTA -->
+  <section class="relative px-6 py-24 flex flex-col items-center overflow-hidden">
+    <div class="absolute inset-0 bg-ember-glow pointer-events-none"></div>
+    <img src="{{ url_for('static', filename='img/icon.png') }}"
+         alt="Aniku"
+         class="w-20 h-20 rounded-[24%] mb-6 animate-float"
+         style="box-shadow:0 0 40px rgba(232,75,26,0.5)" />
+    <p class="font-display text-5xl md:text-7xl tracking-widest text-center text-bone mb-3">
+      SIAP MARATHON?
+    </p>
+    <p class="text-dim text-center text-sm mb-10 max-w-xs">
+      Download sekarang, gratis selamanya. Tidak perlu kartu kredit, tidak ada iklan.
+    </p>
+    <a href="https://github.com/RMBLOGG/aniku-app/releases/download/v1.0.0/Aniku.apk"
+       class="dl-btn flex items-center gap-3 text-white font-semibold text-xl px-10 py-5 rounded-2xl"
+       download>
+      <i class="fa-solid fa-download text-lg"></i>
+      Download Gratis — v1.0.0
+    </a>
+    <p class="text-dim text-xs mt-4">Android 6.0+ &nbsp;·&nbsp; APK ~15 MB</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="px-6 py-8 border-t border-smoke">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+
+      <!-- Brand -->
+      <div class="flex items-center gap-2">
+        <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-6 h-6 rounded-lg" />
+        <span class="font-display tracking-widest text-dim text-sm">ANIKU</span>
+      </div>
+
+      <!-- Copyright -->
+      <p class="text-dim text-xs text-center">
+        &copy; 2024 Aniku. Seluruh hak cipta dilindungi.<br class="md:hidden" />
+        <span class="hidden md:inline">&nbsp;·&nbsp;</span>
+        Dibuat untuk komunitas anime Indonesia.
+      </p>
+
+      <!-- Legal links -->
+      <div class="flex items-center gap-4 text-xs text-dim">
+        <a href="#" class="hover:text-bone transition-colors">Kebijakan Privasi</a>
+        <span class="opacity-30">|</span>
+        <a href="#" class="hover:text-bone transition-colors">Syarat Penggunaan</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Particle script -->
+  <script>
+    const container = document.getElementById('particles');
+    function spawnParticle() {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const x = Math.random() * 100;
+      const dur = 2 + Math.random() * 3;
+      const delay = Math.random() * 2;
+      p.style.cssText = `left:${x}%;bottom:10%;animation-duration:${dur}s;animation-delay:${delay}s;opacity:0`;
+      container.appendChild(p);
+      setTimeout(() => p.remove(), (dur + delay + 0.5) * 1000);
+    }
+    setInterval(spawnParticle, 200);
+  </script>
+
+</body>
+</html>
