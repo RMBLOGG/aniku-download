@@ -505,11 +505,12 @@
     <p class="text-dim text-center text-sm mb-10 max-w-xs">
       Download sekarang, gratis selamanya. Tidak perlu kartu kredit, tidak ada iklan.
     </p>
-    <a href="https://github.com/RMBLOGG/aniku-app/releases/download/v1.3.0/Aniku.apk"
+    <a id="dl-btn"
+       href="#"
        class="dl-btn flex items-center gap-3 text-white font-semibold text-xl px-10 py-5 rounded-2xl"
        download>
       <i class="fa-solid fa-download text-lg"></i>
-      Download Gratis — v1.3.0
+      <span id="dl-label">Memuat...</span>
     </a>
     <p class="text-dim text-xs mt-4">Android 6.0+ &nbsp;·&nbsp; APK ~20 MB</p>
   </section>
@@ -631,6 +632,29 @@
       setTimeout(() => p.remove(), (dur + delay + 0.5) * 1000);
     }
     setInterval(spawnParticle, 200);
+  </script>
+
+  <!-- Dynamic GitHub Release -->
+  <script>
+    (async () => {
+      const REPO = 'RMBLOGG/aniku-app';
+      const btn = document.getElementById('dl-btn');
+      const label = document.getElementById('dl-label');
+      try {
+        const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
+        if (!res.ok) throw new Error('fetch failed');
+        const data = await res.json();
+        const version = data.tag_name;
+        const apk = data.assets.find(a => a.name.endsWith('.apk'));
+        if (!apk) throw new Error('no apk');
+        btn.href = apk.browser_download_url;
+        label.textContent = `Download Gratis — ${version}`;
+      } catch (e) {
+        btn.href = `https://github.com/${REPO}/releases/latest`;
+        btn.removeAttribute('download');
+        label.textContent = 'Download di GitHub';
+      }
+    })();
   </script>
 
 </body>
