@@ -3,562 +3,374 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ANIKU — Nonton Anime Tanpa Batas</title>
-  <meta name="description" content="Aniku adalah aplikasi streaming anime Android gratis. Tonton ribuan anime sub Indonesia kapan saja, di mana saja." />
-
-  <!-- Tailwind CDN -->
+  <title>Aniku — Nonton Anime Gratis di Android</title>
+  <meta name="description" content="Streaming anime sub Indonesia, gratis selamanya. Download APK Aniku untuk Android." />
+  <link rel="icon" href="{{ url_for('static', filename='img/icon.png') }}" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          colors: {
-            ember:   '#E84B1A',
-            lava:    '#C0391A',
-            coal:    '#0E0A09',
-            ash:     '#1A1210',
-            smoke:   '#2B1E1A',
-            bone:    '#F0EAE6',
-            dim:     '#9E8A82',
-          },
           fontFamily: {
-            display: ['"Bebas Neue"', 'sans-serif'],
-            body:    ['"Inter"', 'sans-serif'],
+            sans: ['Space Grotesk', 'sans-serif'],
+            mono: ['Space Mono', 'monospace'],
           },
-          backgroundImage: {
-            'radial-fire': 'radial-gradient(ellipse at 50% 0%, rgba(232,75,26,0.25) 0%, rgba(14,10,9,0) 70%)',
-            'ember-glow':  'radial-gradient(circle at 50% 50%, rgba(232,75,26,0.15) 0%, transparent 70%)',
-          },
-          animation: {
-            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'float':      'float 6s ease-in-out infinite',
-            'glow':       'glow 3s ease-in-out infinite',
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0px)' },
-              '50%':      { transform: 'translateY(-12px)' },
-            },
-            glow: {
-              '0%, 100%': { boxShadow: '0 0 20px rgba(232,75,26,0.4), 0 0 60px rgba(232,75,26,0.1)' },
-              '50%':      { boxShadow: '0 0 40px rgba(232,75,26,0.7), 0 0 100px rgba(232,75,26,0.2)' },
-            },
+          colors: {
+            ink:    '#0b0c10',
+            panel:  '#111318',
+            edge:   '#1e2028',
+            muted:  '#3a3d4a',
+            dim:    '#6b6f80',
+            mid:    '#9ca3af',
+            bone:   '#e8e9ed',
+            white:  '#ffffff',
+            red:    '#ff3d5a',
+            redlow: '#ff3d5a1a',
           },
         }
       }
     }
   </script>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
   <style>
+    * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body { background-color: #0E0A09; }
+    body { background: #0b0c10; color: #e8e9ed; font-family: 'Space Grotesk', sans-serif; }
 
-    /* Ember particle effect */
-    .particle {
-      position: absolute;
-      width: 3px;
-      height: 3px;
-      border-radius: 50%;
-      background: #E84B1A;
-      animation: rise linear infinite;
-      opacity: 0;
-    }
-    @keyframes rise {
-      0%   { transform: translateY(0) scale(1); opacity: 0.8; }
-      100% { transform: translateY(-200px) scale(0); opacity: 0; }
-    }
-
-    /* Icon glow ring */
-    .icon-ring::before {
+    /* ── NOISE OVERLAY ── */
+    body::before {
       content: '';
-      position: absolute;
-      inset: -6px;
-      border-radius: 28%;
-      background: conic-gradient(from 0deg, #E84B1A, #FF6B35, #C0391A, #E84B1A);
-      animation: spin 8s linear infinite;
-      z-index: -1;
-      opacity: 0.6;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Feature card hover */
-    .feat-card {
-      background: linear-gradient(135deg, rgba(43,30,26,0.8) 0%, rgba(26,18,16,0.9) 100%);
-      border: 1px solid rgba(232,75,26,0.15);
-      transition: border-color 0.3s, transform 0.3s;
-    }
-    .feat-card:hover {
-      border-color: rgba(232,75,26,0.5);
-      transform: translateY(-4px);
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.025;
     }
 
-    /* Screenshot mockup */
-    .phone-frame {
-      background: linear-gradient(160deg, #2B1E1A, #1A1210);
-      border: 1.5px solid rgba(232,75,26,0.3);
-      box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 40px rgba(232,75,26,0.08);
+    /* ── NAV ── */
+    nav { border-bottom: 1px solid #1e2028; backdrop-filter: blur(16px); background: rgba(11,12,16,0.85); }
+
+    /* ── HERO ── */
+    .hero-grid {
+      background-image:
+        linear-gradient(rgba(255,61,90,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,61,90,0.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .hero-glow {
+      background: radial-gradient(ellipse 70% 55% at 50% 50%, rgba(255,61,90,0.12) 0%, transparent 70%);
     }
 
-    /* Download button */
+    /* ── DOWNLOAD BUTTON ── */
     .dl-btn {
-      background: linear-gradient(135deg, #E84B1A 0%, #C0391A 100%);
-      box-shadow: 0 4px 30px rgba(232,75,26,0.4);
-      transition: all 0.25s;
+      background: #ff3d5a;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 0 0 0 rgba(255,61,90,0);
     }
     .dl-btn:hover {
-      transform: scale(1.04);
-      box-shadow: 0 6px 40px rgba(232,75,26,0.6);
+      background: #ff2248;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255,61,90,0.35);
     }
-    .dl-btn:active { transform: scale(0.98); }
+    .dl-btn:active { transform: translateY(0); }
 
-    /* Section divider */
-    .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(232,75,26,0.4), transparent);
+    /* ── FEATURE CARD ── */
+    .feat {
+      border: 1px solid #1e2028;
+      background: #111318;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .feat:hover { border-color: rgba(255,61,90,0.3); background: #14151a; }
+
+    /* ── SCREENSHOT ── */
+    .phone-frame {
+      border-radius: 36px;
+      box-shadow: 0 0 0 2px #1e2028, 0 32px 64px rgba(0,0,0,0.6);
+      overflow: hidden;
     }
 
-    /* Feature icon box */
-    .feat-icon {
-      width: 2.25rem;
-      height: 2.25rem;
-      border-radius: 0.6rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(232,75,26,0.12);
-      border: 1px solid rgba(232,75,26,0.25);
-      color: #E84B1A;
-      font-size: 0.9rem;
-      flex-shrink: 0;
+    /* ── STEP ── */
+    .step-line { width: 1px; background: linear-gradient(to bottom, #ff3d5a44, transparent); }
+
+    /* ── CHANGELOG ── */
+    .cl-card {
+      border: 1px solid #1e2028;
+      background: #111318;
+      border-radius: 16px;
+      overflow: hidden;
     }
+    .cl-card.latest { border-color: rgba(255,61,90,0.35); }
+
+    /* ── MODAL ── */
+    .modal-overlay { background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); }
+
+    /* ── FADE IN ── */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s ease both; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0b0c10; }
+    ::-webkit-scrollbar-thumb { background: #3a3d4a; border-radius: 2px; }
+
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
   </style>
 </head>
-
-<body class="font-body text-bone overflow-x-hidden">
+<body class="overflow-x-hidden relative">
 
   <!-- NAV -->
-  <nav class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
-       style="background: linear-gradient(to bottom, rgba(14,10,9,0.95), transparent); backdrop-filter: blur(8px);">
-    <div class="flex items-center gap-2">
-      <img src="{{ url_for('static', filename='img/icon.png') }}" alt="Aniku" class="w-8 h-8 rounded-xl" />
-      <span class="font-display text-2xl tracking-widest text-bone">ANIKU</span>
+  <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-8 h-8 rounded-xl" alt="Aniku" />
+      <span class="font-mono font-bold text-sm tracking-widest text-bone uppercase">Aniku</span>
     </div>
+    <a id="nav-dl" href="#" class="hidden sm:flex items-center gap-2 text-xs font-semibold text-red border border-red/30 hover:border-red hover:bg-redlow px-4 py-2 rounded-full transition-all">
+      <i class="fa-solid fa-download"></i> <span id="nav-version">Download</span>
+    </a>
   </nav>
 
   <!-- HERO -->
-  <section class="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-16 overflow-hidden">
+  <section class="relative min-h-screen flex flex-col items-center justify-center px-6 pt-28 pb-20 overflow-hidden hero-grid">
+    <div class="absolute inset-0 hero-glow pointer-events-none"></div>
+    <div class="relative z-10 flex flex-col items-center text-center max-w-lg">
 
-    <!-- Background radial glow -->
-    <div class="absolute inset-0 bg-radial-fire pointer-events-none"></div>
-
-    <!-- Ember particles -->
-    <div id="particles" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
-
-    <!-- App Icon -->
-    <div class="relative animate-float mb-8">
-      <div class="icon-ring relative w-32 h-32 md:w-40 md:h-40 rounded-[28%] overflow-hidden animate-glow">
-        <img src="{{ url_for('static', filename='img/icon.png') }}"
-             alt="Aniku App Icon"
-             class="w-full h-full object-cover" />
+      <div class="fade-up mb-8">
+        <div class="w-24 h-24 rounded-[28%] overflow-hidden ring-2 ring-edge shadow-2xl mx-auto" style="box-shadow: 0 0 40px rgba(255,61,90,0.2)">
+          <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-full h-full object-cover" alt="Aniku" />
+        </div>
       </div>
+
+      <div class="fade-up delay-1 mb-2">
+        <span class="font-mono text-xs text-red tracking-[0.3em] uppercase">Android App</span>
+      </div>
+
+      <h1 class="fade-up delay-1 text-4xl sm:text-6xl font-bold text-white leading-[1.1] tracking-tight mb-5">
+        Anime sub Indo,<br /><span class="text-red">gratis selamanya.</span>
+      </h1>
+
+      <p class="fade-up delay-2 text-mid text-base sm:text-lg leading-relaxed mb-10 max-w-sm">
+        Streaming ribuan anime tanpa iklan, tanpa langganan. Langsung dari HP kamu.
+      </p>
+
+      <div class="fade-up delay-3 flex flex-col items-center gap-3">
+        <a id="dl-btn" href="#"
+           class="dl-btn flex items-center gap-3 text-white font-bold text-base px-8 py-4 rounded-2xl"
+           download>
+          <i class="fa-solid fa-download"></i>
+          <span id="dl-label">Memuat…</span>
+        </a>
+        <p class="text-dim text-xs">Android 6.0+ · APK ~20 MB · <span id="dl-size"></span></p>
+      </div>
+
     </div>
 
-    <!-- Headline -->
-    <h1 class="font-display text-center text-3xl md:text-5xl tracking-widest leading-tight mb-4">
-      <span class="text-bone">NONTON </span><span class="text-ember">ANIME </span><span class="text-bone">GRATIS</span>
-    </h1>
-
-    <p class="text-center text-dim text-base md:text-lg max-w-sm mt-4 mb-10 leading-relaxed">
-      Ribuan judul anime sub Indonesia. Tanpa iklan mengganggu. Langsung di genggamanmu.
-    </p>
-
-    <!-- Scroll cue -->
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-40 animate-bounce">
-      <div class="w-px h-8 bg-ember"></div>
-      <i class="fa-solid fa-chevron-down text-ember text-sm"></i>
+    <!-- scroll hint -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-30">
+      <div class="w-px h-8 bg-red"></div>
+      <i class="fa-solid fa-chevron-down text-red text-xs"></i>
     </div>
   </section>
 
-  <div class="divider mx-6"></div>
+  <!-- STATS BAR -->
+  <div class="border-y border-edge bg-panel">
+    <div class="max-w-4xl mx-auto px-6 py-5 grid grid-cols-3 divide-x divide-edge text-center">
+      <div class="px-4">
+        <p class="text-white font-bold text-2xl">100%</p>
+        <p class="text-dim text-xs mt-0.5">Gratis</p>
+      </div>
+      <div class="px-4">
+        <p class="text-white font-bold text-2xl">0</p>
+        <p class="text-dim text-xs mt-0.5">Iklan</p>
+      </div>
+      <div class="px-4">
+        <p class="text-white font-bold text-2xl">Sub ID</p>
+        <p class="text-dim text-xs mt-0.5">Bahasa Indonesia</p>
+      </div>
+    </div>
+  </div>
 
   <!-- FEATURES -->
-  <section class="px-6 py-20 max-w-5xl mx-auto">
-    <p class="font-display text-center text-4xl md:text-5xl tracking-widest text-bone mb-3">KENAPA ANIKU?</p>
-    <p class="text-center text-dim text-sm mb-14">Semua yang kamu butuhkan untuk marathon anime.</p>
-
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-
-      <div class="feat-card rounded-2xl p-5">
-        <div class="text-ember text-2xl mb-3"><i class="fa-solid fa-play"></i></div>
-        <h3 class="font-semibold text-bone text-base mb-1">Streaming Langsung</h3>
-        <p class="text-dim text-sm leading-relaxed">Tonton episode terbaru tanpa perlu download manual.</p>
-      </div>
-
-      <div class="feat-card rounded-2xl p-5">
-        <div class="text-ember text-2xl mb-3"><i class="fa-solid fa-bookmark"></i></div>
-        <h3 class="font-semibold text-bone text-base mb-1">Bookmark</h3>
-        <p class="text-dim text-sm leading-relaxed">Simpan anime favoritmu, lanjutkan kapan saja.</p>
-      </div>
-
-      <div class="feat-card rounded-2xl p-5">
-        <div class="text-ember text-2xl mb-3"><i class="fa-solid fa-calendar-days"></i></div>
-        <h3 class="font-semibold text-bone text-base mb-1">Jadwal Tayang</h3>
-        <p class="text-dim text-sm leading-relaxed">Lihat anime yang tayang hari ini sesuai hari rilis.</p>
-      </div>
-
-      <div class="feat-card rounded-2xl p-5">
-        <div class="text-ember text-2xl mb-3"><i class="fa-solid fa-magnifying-glass"></i></div>
-        <h3 class="font-semibold text-bone text-base mb-1">Cari & Filter Genre</h3>
-        <p class="text-dim text-sm leading-relaxed">Temukan anime berdasarkan genre atau judul dengan cepat.</p>
-      </div>
-
-      <div class="feat-card rounded-2xl p-5">
-        <div class="text-ember text-2xl mb-3"><i class="fa-solid fa-user"></i></div>
-        <h3 class="font-semibold text-bone text-base mb-1">Akun Gratis</h3>
-        <p class="text-dim text-sm leading-relaxed">Daftar dengan email, sinkronisasi bookmark antar perangkat.</p>
-      </div>
-
-      <div class="feat-card rounded-2xl p-5">
-        <div class="text-ember text-2xl mb-3"><i class="fa-solid fa-circle-half-stroke"></i></div>
-        <h3 class="font-semibold text-bone text-base mb-1">Dark & Light Mode</h3>
-        <p class="text-dim text-sm leading-relaxed">Tema sesuai selera, mata tetap nyaman marathon malam.</p>
-      </div>
-
+  <section class="px-6 py-24 max-w-5xl mx-auto">
+    <div class="mb-14 text-center">
+      <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Fitur</span>
+      <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Semua yang kamu butuhkan.</h2>
     </div>
-  </section>
-
-  <div class="divider mx-6"></div>
-
-  <!-- SCREENSHOT SHOWCASE — Modern 3-panel style -->
-  <section class="relative py-28 overflow-hidden">
-
-    <!-- Ambient background glow -->
-    <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(232,75,26,0.07) 0%, transparent 70%);"></div>
-    <!-- Subtle grid texture -->
-    <div class="absolute inset-0 pointer-events-none opacity-[0.03]"
-         style="background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px); background-size: 40px 40px;"></div>
-
-    <div class="relative max-w-6xl mx-auto px-6">
-
-      <!-- Heading -->
-      <div class="text-center mb-20">
-        <span class="inline-block text-xs font-semibold tracking-[0.25em] uppercase px-4 py-1.5 rounded-full mb-5"
-              style="background:rgba(232,75,26,0.1);border:1px solid rgba(232,75,26,0.25);color:#E84B1A;">
-          Preview Aplikasi
-        </span>
-        <p class="font-display text-4xl md:text-6xl tracking-widest text-bone mb-4">TAMPILAN APLIKASI</p>
-        <p class="text-dim text-sm max-w-xs mx-auto leading-relaxed">Real screenshots. Bukan mockup. Langsung dari HP.</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div class="feat rounded-2xl p-5">
+        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+          <i class="fa-solid fa-play text-sm"></i>
+        </div>
+        <h3 class="font-semibold text-bone text-sm mb-1">Streaming Langsung</h3>
+        <p class="text-dim text-xs leading-relaxed">Tonton episode terbaru tanpa download manual.</p>
       </div>
-
-      <!-- ── SHOWCASE STAGE ── -->
-      <div class="relative flex items-center justify-center" style="min-height: 520px;">
-
-        <!-- LEFT side card (prev screenshot) -->
-        <div id="ss-left-card" class="absolute hidden md:block pointer-events-none select-none"
-             style="left: 0; top: 50%; transform: translateY(-50%) rotate(-6deg) translateX(40px); z-index: 1; width: 160px; opacity: 0.45; filter: blur(1px);">
-          <div class="relative rounded-[28px] overflow-hidden"
-               style="box-shadow: 0 20px 60px rgba(0,0,0,0.7); border: 1.5px solid rgba(255,255,255,0.07);">
-            <img id="ss-left-img" src="{{ url_for('static', filename='img/ss4.png') }}" alt="" class="w-full block" />
-          </div>
+      <div class="feat rounded-2xl p-5">
+        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+          <i class="fa-solid fa-bookmark text-sm"></i>
         </div>
-
-        <!-- RIGHT side card (next screenshot) -->
-        <div id="ss-right-card" class="absolute hidden md:block pointer-events-none select-none"
-             style="right: 0; top: 50%; transform: translateY(-50%) rotate(6deg) translateX(-40px); z-index: 1; width: 160px; opacity: 0.45; filter: blur(1px);">
-          <div class="relative rounded-[28px] overflow-hidden"
-               style="box-shadow: 0 20px 60px rgba(0,0,0,0.7); border: 1.5px solid rgba(255,255,255,0.07);">
-            <img id="ss-right-img" src="{{ url_for('static', filename='img/ss2.png') }}" alt="" class="w-full block" />
-          </div>
-        </div>
-
-        <!-- CENTER main phone -->
-        <div class="relative z-10 flex flex-col items-center gap-8">
-
-          <!-- Phone frame -->
-          <div class="relative" style="width: 220px;">
-            <!-- Multi-layer glow -->
-            <div class="absolute pointer-events-none"
-                 style="inset:-30px; border-radius:60px; background:radial-gradient(ellipse, rgba(232,75,26,0.35) 0%, transparent 65%); filter:blur(20px); animation: glowPulse 3s ease-in-out infinite;"></div>
-
-            <!-- Phone border ring -->
-            <div class="relative rounded-[36px] p-[2px]"
-                 style="background: linear-gradient(135deg, rgba(232,75,26,0.6), rgba(192,57,26,0.2), rgba(232,75,26,0.5));">
-              <div class="rounded-[34px] overflow-hidden bg-coal" id="ss-main-wrap">
-                <!-- Slide strip -->
-                <div style="overflow:hidden;">
-                  <div class="flex transition-transform duration-500 ease-[cubic-bezier(.32,.72,0,1)]" id="ss-slides" style="will-change:transform;">
-                    <img src="{{ url_for('static', filename='img/ss1.png') }}" alt="Screenshot 1" class="w-full shrink-0 block" />
-                    <img src="{{ url_for('static', filename='img/ss2.png') }}" alt="Screenshot 2" class="w-full shrink-0 block" />
-                    <img src="{{ url_for('static', filename='img/ss3.png') }}" alt="Screenshot 3" class="w-full shrink-0 block" />
-                    <img src="{{ url_for('static', filename='img/ss4.png') }}" alt="Screenshot 4" class="w-full shrink-0 block" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Nav arrows on phone -->
-            <button onclick="ssSlide(-1)"
-                    class="absolute -left-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
-                    style="background:rgba(14,10,9,0.85);border:1px solid rgba(232,75,26,0.35);backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(0,0,0,0.5);color:#F0EAE6;font-size:0.75rem;z-index:20;">
-              <i class="fa-solid fa-chevron-left"></i>
-            </button>
-            <button onclick="ssSlide(1)"
-                    class="absolute -right-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
-                    style="background:rgba(14,10,9,0.85);border:1px solid rgba(232,75,26,0.35);backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(0,0,0,0.5);color:#F0EAE6;font-size:0.75rem;z-index:20;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </button>
-          </div>
-
-          <!-- Dot + progress indicator -->
-          <div class="flex items-center gap-2">
-            <button onclick="ssGoTo(0)" class="ss-dot rounded-full transition-all duration-300" style="height:4px;"></button>
-            <button onclick="ssGoTo(1)" class="ss-dot rounded-full transition-all duration-300" style="height:4px;"></button>
-            <button onclick="ssGoTo(2)" class="ss-dot rounded-full transition-all duration-300" style="height:4px;"></button>
-            <button onclick="ssGoTo(3)" class="ss-dot rounded-full transition-all duration-300" style="height:4px;"></button>
-          </div>
-        </div>
+        <h3 class="font-semibold text-bone text-sm mb-1">Bookmark</h3>
+        <p class="text-dim text-xs leading-relaxed">Simpan anime favorit, lanjutkan kapan saja.</p>
       </div>
-
-      <!-- ── CAPTION CARDS (below stage) ── -->
-      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-3">
-
-        <button onclick="ssGoTo(0)" class="ss-tab text-left rounded-2xl p-4 transition-all duration-300" data-slide="0"
-                style="border:1px solid rgba(255,255,255,0.06);">
-          <div class="w-8 h-8 rounded-xl flex items-center justify-center mb-3 text-sm"
-               style="background:rgba(232,75,26,0.12);border:1px solid rgba(232,75,26,0.2);color:#E84B1A;">
-            <i class="fa-solid fa-compass"></i>
-          </div>
-          <p class="text-bone text-xs font-semibold mb-1">Eksplor</p>
-          <p class="text-dim text-xs leading-relaxed">Filter genre & status anime</p>
-        </button>
-
-        <button onclick="ssGoTo(1)" class="ss-tab text-left rounded-2xl p-4 transition-all duration-300" data-slide="1"
-                style="border:1px solid rgba(255,255,255,0.06);">
-          <div class="w-8 h-8 rounded-xl flex items-center justify-center mb-3 text-sm"
-               style="background:rgba(232,75,26,0.12);border:1px solid rgba(232,75,26,0.2);color:#E84B1A;">
-            <i class="fa-solid fa-circle-info"></i>
-          </div>
-          <p class="text-bone text-xs font-semibold mb-1">Detail Anime</p>
-          <p class="text-dim text-xs leading-relaxed">Info lengkap & daftar episode</p>
-        </button>
-
-        <button onclick="ssGoTo(2)" class="ss-tab text-left rounded-2xl p-4 transition-all duration-300" data-slide="2"
-                style="border:1px solid rgba(255,255,255,0.06);">
-          <div class="w-8 h-8 rounded-xl flex items-center justify-center mb-3 text-sm"
-               style="background:rgba(232,75,26,0.12);border:1px solid rgba(232,75,26,0.2);color:#E84B1A;">
-            <i class="fa-solid fa-play"></i>
-          </div>
-          <p class="text-bone text-xs font-semibold mb-1">Video Player</p>
-          <p class="text-dim text-xs leading-relaxed">480p–1080p, multi-server</p>
-        </button>
-
-        <button onclick="ssGoTo(3)" class="ss-tab text-left rounded-2xl p-4 transition-all duration-300" data-slide="3"
-                style="border:1px solid rgba(255,255,255,0.06);">
-          <div class="w-8 h-8 rounded-xl flex items-center justify-center mb-3 text-sm"
-               style="background:rgba(232,75,26,0.12);border:1px solid rgba(232,75,26,0.2);color:#E84B1A;">
-            <i class="fa-solid fa-list"></i>
-          </div>
-          <p class="text-bone text-xs font-semibold mb-1">Daftar Episode</p>
-          <p class="text-dim text-xs leading-relaxed">Navigasi batch, mudah & cepat</p>
-        </button>
-
+      <div class="feat rounded-2xl p-5">
+        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+          <i class="fa-solid fa-calendar-days text-sm"></i>
+        </div>
+        <h3 class="font-semibold text-bone text-sm mb-1">Jadwal Tayang</h3>
+        <p class="text-dim text-xs leading-relaxed">Anime yang rilis hari ini, langsung terlihat.</p>
+      </div>
+      <div class="feat rounded-2xl p-5">
+        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+          <i class="fa-solid fa-magnifying-glass text-sm"></i>
+        </div>
+        <h3 class="font-semibold text-bone text-sm mb-1">Cari & Filter</h3>
+        <p class="text-dim text-xs leading-relaxed">Temukan anime berdasarkan genre atau judul.</p>
+      </div>
+      <div class="feat rounded-2xl p-5">
+        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+          <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+        </div>
+        <h3 class="font-semibold text-bone text-sm mb-1">Riwayat Tonton</h3>
+        <p class="text-dim text-xs leading-relaxed">Otomatis tercatat, langsung lanjut dari episode terakhir.</p>
+      </div>
+      <div class="feat rounded-2xl p-5">
+        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+          <i class="fa-solid fa-users text-sm"></i>
+        </div>
+        <h3 class="font-semibold text-bone text-sm mb-1">Feed Sosial</h3>
+        <p class="text-dim text-xs leading-relaxed">Post, like, komentar bersama sesama penonton.</p>
       </div>
     </div>
   </section>
 
-  <style>
-    @keyframes glowPulse {
-      0%, 100% { opacity: 0.6; transform: scale(1); }
-      50%       { opacity: 1;   transform: scale(1.08); }
-    }
-    .ss-tab.active {
-      background: rgba(232,75,26,0.08);
-      border-color: rgba(232,75,26,0.35) !important;
-    }
-    .ss-tab:not(.active):hover {
-      background: rgba(255,255,255,0.03);
-      border-color: rgba(255,255,255,0.12) !important;
-    }
-  </style>
+  <!-- SCREENSHOTS -->
+  <section class="py-24 border-t border-edge overflow-hidden">
+    <div class="max-w-5xl mx-auto px-6 mb-14 text-center">
+      <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Screenshots</span>
+      <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Tampilan nyata dari HP.</h2>
+      <p class="text-dim text-sm mt-2">Bukan mockup. Langsung dari Aniku.</p>
+    </div>
 
-  <script>
-    const ssImgs = [
-      "{{ url_for('static', filename='img/ss1.png') }}",
-      "{{ url_for('static', filename='img/ss2.png') }}",
-      "{{ url_for('static', filename='img/ss3.png') }}",
-      "{{ url_for('static', filename='img/ss4.png') }}",
-    ];
-    let ssCurrent = 0;
-    const ssTotal = 4;
-
-    function ssUpdateUI() {
-      // Slide the strip
-      document.getElementById('ss-slides').style.transform = `translateX(-${ssCurrent * 100}%)`;
-
-      // Side cards
-      const prev = (ssCurrent - 1 + ssTotal) % ssTotal;
-      const next = (ssCurrent + 1) % ssTotal;
-      document.getElementById('ss-left-img').src  = ssImgs[prev];
-      document.getElementById('ss-right-img').src = ssImgs[next];
-
-      // Dots
-      document.querySelectorAll('.ss-dot').forEach((d, i) => {
-        d.style.background = i === ssCurrent ? '#E84B1A' : 'rgba(232,75,26,0.25)';
-        d.style.width = i === ssCurrent ? '1.75rem' : '0.5rem';
-      });
-
-      // Caption tabs
-      document.querySelectorAll('.ss-tab').forEach(t => {
-        t.classList.toggle('active', parseInt(t.dataset.slide) === ssCurrent);
-      });
-    }
-
-    function ssSlide(dir) {
-      ssCurrent = (ssCurrent + dir + ssTotal) % ssTotal;
-      ssUpdateUI();
-    }
-    function ssGoTo(idx) {
-      ssCurrent = idx;
-      ssUpdateUI();
-    }
-
-    // Auto-play
-    setInterval(() => ssSlide(1), 4500);
-
-    // Touch swipe
-    let ssStartX = 0;
-    const ssWrap = document.getElementById('ss-main-wrap');
-    ssWrap.addEventListener('touchstart', e => { ssStartX = e.touches[0].clientX; }, {passive:true});
-    ssWrap.addEventListener('touchend',   e => {
-      const diff = ssStartX - e.changedTouches[0].clientX;
-      if (Math.abs(diff) > 35) ssSlide(diff > 0 ? 1 : -1);
-    });
-
-    ssUpdateUI();
-  </script>
-
-  <div class="divider mx-6"></div>
+    <div class="flex items-end justify-center gap-4 px-6 overflow-x-auto pb-4" style="scroll-snap-type:x mandatory;">
+      <div class="phone-frame shrink-0 w-36 sm:w-44 opacity-50 scale-95 hover:opacity-80 hover:scale-100 transition-all duration-300 cursor-pointer" style="scroll-snap-align:center">
+        <img src="{{ url_for('static', filename='img/ss4.png') }}" alt="Screenshot 4" class="w-full block" />
+      </div>
+      <div class="phone-frame shrink-0 w-44 sm:w-52 z-10" style="scroll-snap-align:center; box-shadow: 0 0 0 2px rgba(255,61,90,0.4), 0 32px 80px rgba(0,0,0,0.7);">
+        <img src="{{ url_for('static', filename='img/ss1.png') }}" alt="Screenshot 1" class="w-full block" />
+      </div>
+      <div class="phone-frame shrink-0 w-36 sm:w-44 opacity-50 scale-95 hover:opacity-80 hover:scale-100 transition-all duration-300 cursor-pointer" style="scroll-snap-align:center">
+        <img src="{{ url_for('static', filename='img/ss2.png') }}" alt="Screenshot 2" class="w-full block" />
+      </div>
+      <div class="phone-frame shrink-0 w-36 sm:w-44 opacity-50 scale-95 hover:opacity-80 hover:scale-100 transition-all duration-300 cursor-pointer" style="scroll-snap-align:center; display:none" id="ss3-wrap">
+        <img src="{{ url_for('static', filename='img/ss3.png') }}" alt="Screenshot 3" class="w-full block" />
+      </div>
+    </div>
+  </section>
 
   <!-- CARA INSTALL -->
-  <section class="px-6 py-20 max-w-3xl mx-auto">
-    <p class="font-display text-center text-4xl md:text-5xl tracking-widest text-bone mb-12">CARA INSTALL</p>
-    <div class="flex flex-col gap-6">
+  <section class="px-6 py-24 border-t border-edge max-w-2xl mx-auto">
+    <div class="mb-14 text-center">
+      <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Panduan</span>
+      <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Install dalam 3 langkah.</h2>
+    </div>
+    <div class="flex flex-col gap-0">
 
-      <div class="flex items-start gap-5">
-        <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-ember font-display text-xl"
-             style="background:rgba(232,75,26,0.12);border:1px solid rgba(232,75,26,0.3);">1</div>
-        <div>
+      <div class="flex gap-5">
+        <div class="flex flex-col items-center">
+          <div class="w-9 h-9 rounded-full bg-redlow border border-red/30 flex items-center justify-center text-red font-mono font-bold text-sm shrink-0">1</div>
+          <div class="step-line flex-1 my-2"></div>
+        </div>
+        <div class="pb-10 pt-1">
           <p class="font-semibold text-bone mb-1">Download APK</p>
-          <p class="text-dim text-sm">Klik tombol download di halaman ini. File Aniku.apk akan tersimpan otomatis.</p>
+          <p class="text-dim text-sm leading-relaxed">Tap tombol download di halaman ini. File <code class="font-mono text-xs bg-edge px-1.5 py-0.5 rounded text-red">Aniku.apk</code> tersimpan otomatis ke folder Downloads.</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-5">
-        <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-ember font-display text-xl"
-             style="background:rgba(232,75,26,0.12);border:1px solid rgba(232,75,26,0.3);">2</div>
-        <div>
-          <p class="font-semibold text-bone mb-1">Aktifkan "Install dari Sumber Tidak Dikenal"</p>
-          <p class="text-dim text-sm">Buka Pengaturan → Keamanan → aktifkan izin install APK dari sumber luar Play Store.</p>
+      <div class="flex gap-5">
+        <div class="flex flex-col items-center">
+          <div class="w-9 h-9 rounded-full bg-redlow border border-red/30 flex items-center justify-center text-red font-mono font-bold text-sm shrink-0">2</div>
+          <div class="step-line flex-1 my-2"></div>
+        </div>
+        <div class="pb-10 pt-1">
+          <p class="font-semibold text-bone mb-1">Aktifkan izin install</p>
+          <p class="text-dim text-sm leading-relaxed">Buka <span class="text-mid">Pengaturan → Keamanan</span> lalu aktifkan <span class="text-mid">"Install dari sumber tidak dikenal"</span>. Ini hanya perlu dilakukan sekali.</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-5">
-        <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-ember font-display text-xl"
-             style="background:rgba(232,75,26,0.12);border:1px solid rgba(232,75,26,0.3);">3</div>
-        <div>
-          <p class="font-semibold text-bone mb-1">Buka File APK & Install</p>
-          <p class="text-dim text-sm">Buka file manager, ketuk Aniku.apk, lalu tap Install. Prosesnya hanya beberapa detik.</p>
+      <div class="flex gap-5">
+        <div class="flex flex-col items-center">
+          <div class="w-9 h-9 rounded-full bg-redlow border border-red/30 flex items-center justify-center text-red font-mono font-bold text-sm shrink-0">3</div>
+        </div>
+        <div class="pt-1">
+          <p class="font-semibold text-bone mb-1">Buka & install APK</p>
+          <p class="text-dim text-sm leading-relaxed">Buka file manager, tap <code class="font-mono text-xs bg-edge px-1.5 py-0.5 rounded text-red">Aniku.apk</code>, lalu tap Install. Selesai — nikmati anime gratis!</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-5">
-        <div class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-ember font-display text-xl"
-             style="background:rgba(232,75,26,0.12);border:1px solid rgba(232,75,26,0.3);">4</div>
-        <div>
-          <p class="font-semibold text-bone mb-1">Buka & Nikmati!</p>
-          <p class="text-dim text-sm">Daftar akun gratis atau langsung browse ribuan anime sub Indonesia.</p>
-        </div>
-      </div>
     </div>
   </section>
 
-  <div class="divider mx-6"></div>
-
-  <!-- FINAL CTA -->
-  <section class="relative px-6 py-24 flex flex-col items-center overflow-hidden">
-    <div class="absolute inset-0 bg-ember-glow pointer-events-none"></div>
-    <img src="{{ url_for('static', filename='img/icon.png') }}"
-         alt="Aniku"
-         class="w-20 h-20 rounded-[24%] mb-6 animate-float"
-         style="box-shadow:0 0 40px rgba(232,75,26,0.5)" />
-    <p class="font-display text-5xl md:text-7xl tracking-widest text-center text-bone mb-3">
-      SIAP MARATHON?
-    </p>
-    <p class="text-dim text-center text-sm mb-10 max-w-xs">
-      Download sekarang, gratis selamanya. Tidak perlu kartu kredit, tidak ada iklan.
-    </p>
-    <a id="dl-btn"
-       href="#"
-       class="dl-btn flex items-center gap-3 text-white font-semibold text-xl px-10 py-5 rounded-2xl"
-       download>
-      <i class="fa-solid fa-download text-lg"></i>
-      <span id="dl-label">Memuat...</span>
-    </a>
-    <p class="text-dim text-xs mt-4">Android 6.0+ &nbsp;·&nbsp; APK ~20 MB</p>
+  <!-- CTA -->
+  <section class="px-6 py-24 border-t border-edge">
+    <div class="max-w-lg mx-auto text-center">
+      <div class="w-16 h-16 rounded-[24%] overflow-hidden mx-auto mb-6 ring-2 ring-red/30" style="box-shadow: 0 0 32px rgba(255,61,90,0.25)">
+        <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-full h-full object-cover" alt="Aniku" />
+      </div>
+      <h2 class="text-3xl sm:text-5xl font-bold text-white leading-tight mb-3">Mulai nonton<br />sekarang.</h2>
+      <p class="text-dim text-sm mb-8">Gratis. Tanpa kartu kredit. Tanpa iklan.</p>
+      <a id="dl-btn-2" href="#"
+         class="dl-btn inline-flex items-center gap-3 text-white font-bold text-base px-8 py-4 rounded-2xl"
+         download>
+        <i class="fa-solid fa-download"></i>
+        <span id="dl-label-2">Memuat…</span>
+      </a>
+      <p class="text-dim text-xs mt-4">Android 6.0+ · APK ~20 MB</p>
+    </div>
   </section>
 
-
   <!-- CHANGELOG -->
-  <section class="px-6 py-20 border-t border-smoke" id="changelog">
+  <section class="px-6 py-24 border-t border-edge" id="changelog">
     <div class="max-w-2xl mx-auto">
-      <h2 class="text-2xl font-bold text-bone mb-2 text-center">Riwayat Versi</h2>
-      <p class="text-dim text-sm text-center mb-10">Semua pembaruan Aniku dari waktu ke waktu.</p>
-      <div id="changelog-list" class="flex flex-col gap-4">
-        <p class="text-dim text-sm text-center">Memuat...</p>
+      <div class="mb-12 text-center">
+        <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Changelog</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Riwayat versi.</h2>
+        <p class="text-dim text-sm mt-2">Semua pembaruan dari waktu ke waktu.</p>
+      </div>
+      <div id="changelog-list" class="flex flex-col gap-3">
+        <div class="cl-card p-5 animate-pulse">
+          <div class="h-4 bg-edge rounded w-32 mb-3"></div>
+          <div class="h-3 bg-edge rounded w-full mb-2"></div>
+          <div class="h-3 bg-edge rounded w-4/5"></div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- FOOTER -->
-  <footer class="px-6 py-8 border-t border-smoke">
-    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-
-      <!-- Brand -->
-      <div class="flex items-center gap-2">
+  <footer class="border-t border-edge px-6 py-10">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-5">
+      <div class="flex items-center gap-3">
         <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-6 h-6 rounded-lg" />
-        <span class="font-display tracking-widest text-dim text-sm">ANIKU</span>
+        <span class="font-mono text-dim text-xs tracking-widest uppercase">Aniku</span>
       </div>
-
-      <!-- Copyright -->
-      <p class="text-dim text-xs text-center">
-        &copy; 2026 Aniku. Seluruh hak cipta dilindungi.<br class="md:hidden" />
-        <span class="hidden md:inline">&nbsp;·&nbsp;</span>
-        Dibuat untuk komunitas anime Indonesia.
-      </p>
-
-      <!-- Legal links -->
-      <div class="flex items-center gap-4 text-xs text-dim">
-        <a href="#" onclick="openModal('modal-privasi'); return false;" class="hover:text-bone transition-colors">Kebijakan Privasi</a>
-        <span class="opacity-30">|</span>
-        <a href="#" onclick="openModal('modal-syarat'); return false;" class="hover:text-bone transition-colors">Syarat Penggunaan</a>
+      <p class="text-dim text-xs text-center">© 2026 Aniku · Seluruh hak cipta dilindungi</p>
+      <div class="flex items-center gap-5 text-xs text-dim">
+        <a href="#" onclick="openModal('modal-privasi'); return false;" class="hover:text-bone transition-colors">Privasi</a>
+        <span class="opacity-20">·</span>
+        <a href="#" onclick="openModal('modal-syarat'); return false;" class="hover:text-bone transition-colors">Syarat</a>
+        <span class="opacity-20">·</span>
+        <a href="https://github.com/RMBLOGG/aniku-app" target="_blank" class="hover:text-bone transition-colors"><i class="fa-brands fa-github"></i></a>
       </div>
-
     </div>
   </footer>
 
-  <!-- Modal: Kebijakan Privasi -->
-  <div id="modal-privasi" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);">
-    <div class="bg-[#0f0f13] border border-smoke rounded-2xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl">
-      <div class="flex items-center justify-between px-6 py-4 border-b border-smoke">
-        <h2 class="font-display tracking-widest text-bone text-sm">KEBIJAKAN PRIVASI</h2>
+  <!-- MODALS -->
+  <div id="modal-privasi" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-overlay">
+    <div class="bg-panel border border-edge rounded-2xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-edge">
+        <h2 class="font-mono font-bold text-bone text-xs tracking-widest uppercase">Kebijakan Privasi</h2>
         <button onclick="closeModal('modal-privasi')" class="text-dim hover:text-bone transition-colors text-xl leading-none">&times;</button>
       </div>
       <div class="overflow-y-auto px-6 py-5 text-dim text-sm leading-relaxed space-y-4">
@@ -578,11 +390,10 @@
     </div>
   </div>
 
-  <!-- Modal: Syarat Penggunaan -->
-  <div id="modal-syarat" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);">
-    <div class="bg-[#0f0f13] border border-smoke rounded-2xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl">
-      <div class="flex items-center justify-between px-6 py-4 border-b border-smoke">
-        <h2 class="font-display tracking-widest text-bone text-sm">SYARAT PENGGUNAAN</h2>
+  <div id="modal-syarat" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-overlay">
+    <div class="bg-panel border border-edge rounded-2xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-edge">
+        <h2 class="font-mono font-bold text-bone text-xs tracking-widest uppercase">Syarat Penggunaan</h2>
         <button onclick="closeModal('modal-syarat')" class="text-dim hover:text-bone transition-colors text-xl leading-none">&times;</button>
       </div>
       <div class="overflow-y-auto px-6 py-5 text-dim text-sm leading-relaxed space-y-4">
@@ -604,58 +415,41 @@
     </div>
   </div>
 
-  <!-- Modal Script -->
+  <!-- SCRIPTS -->
   <script>
+    // Modal
     function openModal(id) {
-      const el = document.getElementById(id);
-      el.classList.remove('hidden');
-      el.classList.add('flex');
-      document.body.style.overflow = 'hidden';
+      const m = document.getElementById(id);
+      m.classList.remove('hidden');
+      m.classList.add('flex');
     }
     function closeModal(id) {
-      const el = document.getElementById(id);
-      el.classList.add('hidden');
-      el.classList.remove('flex');
-      document.body.style.overflow = '';
+      const m = document.getElementById(id);
+      m.classList.add('hidden');
+      m.classList.remove('flex');
     }
     document.querySelectorAll('[id^="modal-"]').forEach(modal => {
-      modal.addEventListener('click', function(e) {
-        if (e.target === this) closeModal(this.id);
-      });
+      modal.addEventListener('click', e => { if (e.target === modal) closeModal(modal.id); });
     });
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        document.querySelectorAll('[id^="modal-"]').forEach(m => closeModal(m.id));
-      }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') document.querySelectorAll('[id^="modal-"]').forEach(m => closeModal(m.id));
     });
-  </script>
-
-  <!-- Particle script -->
-  <script>
-    const container = document.getElementById('particles');
-    function spawnParticle() {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      const x = Math.random() * 100;
-      const dur = 2 + Math.random() * 3;
-      const delay = Math.random() * 2;
-      p.style.cssText = `left:${x}%;bottom:10%;animation-duration:${dur}s;animation-delay:${delay}s;opacity:0`;
-      container.appendChild(p);
-      setTimeout(() => p.remove(), (dur + delay + 0.5) * 1000);
-    }
-    setInterval(spawnParticle, 200);
   </script>
 
   <!-- Dynamic GitHub Release + Changelog -->
   <script>
     (async () => {
       const REPO = 'RMBLOGG/aniku-app';
-      const btn = document.getElementById('dl-btn');
-      const label = document.getElementById('dl-label');
-      const list = document.getElementById('changelog-list');
+      const btn  = document.getElementById('dl-btn');
+      const btn2 = document.getElementById('dl-btn-2');
+      const navDl = document.getElementById('nav-dl');
+      const label  = document.getElementById('dl-label');
+      const label2 = document.getElementById('dl-label-2');
+      const navVer = document.getElementById('nav-version');
+      const list   = document.getElementById('changelog-list');
 
       function formatDate(iso) {
-        return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
       }
 
       function renderMarkdown(body) {
@@ -666,18 +460,15 @@
         for (let raw of lines) {
           let line = raw.trim();
           if (!line) { if (inList) { html += '</ul>'; inList = false; } continue; }
-          // skip heading-only lines
           if (/^#+\s/.test(line)) continue;
-          // inline: bold, italic, code, strikethrough
           line = line
-            .replace(/\*\*(.+?)\*\*/g, '<strong class="text-bone">$1</strong>')
-            .replace(/\*(.+?)\*/g, '<em>$1</em>')
-            .replace(/`(.+?)`/g, '<code class="bg-black/40 px-1 rounded text-xs font-mono text-[#e94560]">$1</code>')
-            .replace(/~~(.+?)~~/g, '<s>$1</s>');
-          // bullet
+            .replace(/\*\*(.+?)\*\*/g, '<strong class="text-bone font-semibold">$1</strong>')
+            .replace(/\*(.+?)\*/g,     '<em>$1</em>')
+            .replace(/`(.+?)`/g,       '<code class="bg-ink px-1.5 py-0.5 rounded text-xs font-mono text-red">$1</code>')
+            .replace(/~~(.+?)~~/g,     '<s>$1</s>');
           if (/^[-*] /.test(raw)) {
-            if (!inList) { html += '<ul class="mt-3 flex flex-col gap-1">'; inList = true; }
-            html += `<li class="text-dim text-sm flex gap-2"><span class="text-[#e94560] mt-0.5">·</span><span>${line.replace(/^[-*] /, '')}</span></li>`;
+            if (!inList) { html += '<ul class="mt-3 space-y-1.5">'; inList = true; }
+            html += `<li class="text-dim text-sm flex gap-2.5"><span class="text-red mt-0.5 shrink-0">·</span><span>${line.replace(/^[-*] /, '')}</span></li>`;
           } else {
             if (inList) { html += '</ul>'; inList = false; }
             html += `<p class="text-dim text-sm mt-2">${line}</p>`;
@@ -687,52 +478,68 @@
         return html || null;
       }
 
+      function setDownload(btn, lbl, url, version, isDownload) {
+        btn.href = url;
+        if (isDownload) btn.setAttribute('download', ''); else btn.removeAttribute('download');
+        lbl.textContent = `Download ${version}`;
+      }
+
       try {
         const res = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=10`);
         if (!res.ok) throw new Error('fetch failed');
         const releases = await res.json();
         if (!releases.length) throw new Error('no releases');
 
-        // Tombol download → release terbaru
+        // Tombol utama
         const latest = releases[0];
-        const apk = latest.assets.find(a => a.name.endsWith('.apk'));
-        if (apk) {
-          btn.href = apk.browser_download_url;
-        } else {
-          btn.href = latest.html_url;
-          btn.removeAttribute('download');
-        }
-        label.textContent = `Download Gratis — ${latest.tag_name}`;
+        const latestApk = latest.assets.find(a => a.name.endsWith('.apk'));
+        const latestUrl = latestApk ? latestApk.browser_download_url : latest.html_url;
+        const latestDl  = !!latestApk;
 
-        // Render changelog
+        setDownload(btn,  label,  latestUrl, latest.tag_name, latestDl);
+        setDownload(btn2, label2, latestUrl, latest.tag_name, latestDl);
+        navVer.textContent = latest.tag_name;
+        navDl.href = latestUrl;
+        if (latestDl) navDl.setAttribute('download', '');
+
+        // File size
+        if (latestApk && latestApk.size) {
+          const mb = (latestApk.size / 1024 / 1024).toFixed(1);
+          document.querySelector('#dl-size') && (document.getElementById('dl-size').textContent = `${mb} MB`);
+        }
+
+        // Changelog
         list.innerHTML = releases.map((r, i) => {
-          const apkAsset = r.assets.find(a => a.name.endsWith('.apk'));
-          const dlUrl = apkAsset ? apkAsset.browser_download_url : r.html_url;
-          const notes = renderMarkdown(r.body);
-          const isLatest = i === 0;
+          const apk    = r.assets.find(a => a.name.endsWith('.apk'));
+          const dlUrl  = apk ? apk.browser_download_url : r.html_url;
+          const notes  = renderMarkdown(r.body);
+          const isNew  = i === 0;
+          const size   = apk ? `${(apk.size/1024/1024).toFixed(1)} MB` : '';
           return `
-            <div class="rounded-xl border ${isLatest ? 'border-[#e94560]/40 bg-[#e94560]/5' : 'border-smoke bg-[#1a1a2e]'} p-5">
-              <div class="flex items-center justify-between gap-4 flex-wrap">
-                <div class="flex items-center gap-3">
-                  ${isLatest ? '<span class="text-xs font-semibold bg-[#e94560] text-white px-2 py-0.5 rounded-full">Terbaru</span>' : ''}
-                  <span class="text-bone font-bold">${r.tag_name}</span>
-                  <span class="text-dim text-xs">${formatDate(r.published_at)}</span>
-                </div>
-                <a href="${dlUrl}" ${apkAsset ? 'download' : ''} 
-                   class="flex items-center gap-2 text-sm font-semibold text-[#e94560] hover:text-white transition-colors">
-                  <i class="fa-solid fa-download text-xs"></i> Download
-                </a>
-              </div>
-              ${notes ? `<div class="mt-2">${notes}</div>` : ''}
-            </div>
-          `;
+<div class="cl-card ${isNew ? 'latest' : ''}">
+  <div class="px-5 py-4 flex items-center justify-between gap-4 flex-wrap ${notes ? 'border-b border-edge' : ''}">
+    <div class="flex items-center gap-3 flex-wrap">
+      ${isNew ? '<span class="font-mono text-xs font-bold bg-red text-white px-2.5 py-0.5 rounded-full">Terbaru</span>' : ''}
+      <span class="font-mono font-bold text-bone text-sm">${r.tag_name}</span>
+      <span class="text-dim text-xs">${formatDate(r.published_at)}</span>
+      ${size ? `<span class="text-dim text-xs">${size}</span>` : ''}
+    </div>
+    <a href="${dlUrl}" ${apk ? 'download' : 'target="_blank"'}
+       class="flex items-center gap-2 text-xs font-semibold text-red border border-red/30 hover:border-red hover:bg-redlow px-3 py-1.5 rounded-full transition-all whitespace-nowrap">
+      <i class="fa-solid fa-download text-xs"></i> Download
+    </a>
+  </div>
+  ${notes ? `<div class="px-5 py-4">${notes}</div>` : ''}
+</div>`;
         }).join('');
 
       } catch (e) {
-        btn.href = `https://github.com/${REPO}/releases/latest`;
-        btn.removeAttribute('download');
-        label.textContent = 'Download di GitHub';
-        list.innerHTML = '<p class="text-dim text-sm text-center">Gagal memuat riwayat versi.</p>';
+        const fallback = `https://github.com/${REPO}/releases/latest`;
+        [btn, btn2].forEach(b => { b.href = fallback; b.removeAttribute('download'); });
+        [label, label2].forEach(l => { l.textContent = 'Download di GitHub'; });
+        navVer.textContent = 'Download';
+        navDl.href = fallback;
+        list.innerHTML = '<p class="text-dim text-sm text-center py-8">Gagal memuat riwayat versi. <a href="' + fallback + '" class="text-red underline">Lihat di GitHub</a></p>';
       }
     })();
   </script>
