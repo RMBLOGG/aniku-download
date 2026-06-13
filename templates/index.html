@@ -658,13 +658,33 @@
         return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
       }
 
-      function parseNotes(body) {
+      function renderMarkdown(body) {
         if (!body || !body.trim()) return null;
-        // ambil bullet points saja
-        const lines = body.split('\n')
-          .map(l => l.replace(/^[-*] /, '').trim())
-          .filter(l => l.length > 0 && !l.startsWith('#'));
-        return lines.slice(0, 5); // max 5 baris
+        const lines = body.split('\n');
+        let html = '';
+        let inList = false;
+        for (let raw of lines) {
+          let line = raw.trim();
+          if (!line) { if (inList) { html += '</ul>'; inList = false; } continue; }
+          // skip heading-only lines
+          if (/^#+\s/.test(line)) continue;
+          // inline: bold, italic, code, strikethrough
+          line = line
+            .replace(/\*\*(.+?)\*\*/g, '<strong class="text-bone">$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            .replace(/`(.+?)`/g, '<code class="bg-black/40 px-1 rounded text-xs font-mono text-[#e94560]">$1</code>')
+            .replace(/~~(.+?)~~/g, '<s>$1</s>');
+          // bullet
+          if (/^[-*] /.test(raw)) {
+            if (!inList) { html += '<ul class="mt-3 flex flex-col gap-1">'; inList = true; }
+            html += `<li class="text-dim text-sm flex gap-2"><span class="text-[#e94560] mt-0.5">·</span><span>${line.replace(/^[-*] /, '')}</span></li>`;
+          } else {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += `<p class="text-dim text-sm mt-2">${line}</p>`;
+          }
+        }
+        if (inList) html += '</ul>';
+        return html || null;
       }
 
       try {
@@ -688,7 +708,7 @@
         list.innerHTML = releases.map((r, i) => {
           const apkAsset = r.assets.find(a => a.name.endsWith('.apk'));
           const dlUrl = apkAsset ? apkAsset.browser_download_url : r.html_url;
-          const notes = parseNotes(r.body);
+          const notes = renderMarkdown(r.body);
           const isLatest = i === 0;
           return `
             <div class="rounded-xl border ${isLatest ? 'border-[#e94560]/40 bg-[#e94560]/5' : 'border-smoke bg-[#1a1a2e]'} p-5">
@@ -703,7 +723,7 @@
                   <i class="fa-solid fa-download text-xs"></i> Download
                 </a>
               </div>
-              ${notes ? `<ul class="mt-3 flex flex-col gap-1">${notes.map(n => `<li class="text-dim text-sm flex gap-2"><span class="text-[#e94560] mt-0.5">·</span><span>${n}</span></li>`).join('')}</ul>` : ''}
+              ${notes ? `<div class="mt-2">${notes}</div>` : ''}
             </div>
           `;
         }).join('');
