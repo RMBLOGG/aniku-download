@@ -515,6 +515,18 @@
     <p class="text-dim text-xs mt-4">Android 6.0+ &nbsp;·&nbsp; APK ~20 MB</p>
   </section>
 
+
+  <!-- CHANGELOG -->
+  <section class="px-6 py-20 border-t border-smoke" id="changelog">
+    <div class="max-w-2xl mx-auto">
+      <h2 class="text-2xl font-bold text-bone mb-2 text-center">Riwayat Versi</h2>
+      <p class="text-dim text-sm text-center mb-10">Semua pembaruan Aniku dari waktu ke waktu.</p>
+      <div id="changelog-list" class="flex flex-col gap-4">
+        <p class="text-dim text-sm text-center">Memuat...</p>
+      </div>
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <footer class="px-6 py-8 border-t border-smoke">
     <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -634,25 +646,73 @@
     setInterval(spawnParticle, 200);
   </script>
 
-  <!-- Dynamic GitHub Release -->
+  <!-- Dynamic GitHub Release + Changelog -->
   <script>
     (async () => {
       const REPO = 'RMBLOGG/aniku-app';
       const btn = document.getElementById('dl-btn');
       const label = document.getElementById('dl-label');
+      const list = document.getElementById('changelog-list');
+
+      function formatDate(iso) {
+        return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      }
+
+      function parseNotes(body) {
+        if (!body || !body.trim()) return null;
+        // ambil bullet points saja
+        const lines = body.split('\n')
+          .map(l => l.replace(/^[-*] /, '').trim())
+          .filter(l => l.length > 0 && !l.startsWith('#'));
+        return lines.slice(0, 5); // max 5 baris
+      }
+
       try {
-        const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
+        const res = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=10`);
         if (!res.ok) throw new Error('fetch failed');
-        const data = await res.json();
-        const version = data.tag_name;
-        const apk = data.assets.find(a => a.name.endsWith('.apk'));
-        if (!apk) throw new Error('no apk');
-        btn.href = apk.browser_download_url;
-        label.textContent = `Download Gratis — ${version}`;
+        const releases = await res.json();
+        if (!releases.length) throw new Error('no releases');
+
+        // Tombol download → release terbaru
+        const latest = releases[0];
+        const apk = latest.assets.find(a => a.name.endsWith('.apk'));
+        if (apk) {
+          btn.href = apk.browser_download_url;
+        } else {
+          btn.href = latest.html_url;
+          btn.removeAttribute('download');
+        }
+        label.textContent = `Download Gratis — ${latest.tag_name}`;
+
+        // Render changelog
+        list.innerHTML = releases.map((r, i) => {
+          const apkAsset = r.assets.find(a => a.name.endsWith('.apk'));
+          const dlUrl = apkAsset ? apkAsset.browser_download_url : r.html_url;
+          const notes = parseNotes(r.body);
+          const isLatest = i === 0;
+          return `
+            <div class="rounded-xl border ${isLatest ? 'border-[#e94560]/40 bg-[#e94560]/5' : 'border-smoke bg-[#1a1a2e]'} p-5">
+              <div class="flex items-center justify-between gap-4 flex-wrap">
+                <div class="flex items-center gap-3">
+                  ${isLatest ? '<span class="text-xs font-semibold bg-[#e94560] text-white px-2 py-0.5 rounded-full">Terbaru</span>' : ''}
+                  <span class="text-bone font-bold">${r.tag_name}</span>
+                  <span class="text-dim text-xs">${formatDate(r.published_at)}</span>
+                </div>
+                <a href="${dlUrl}" ${apkAsset ? 'download' : ''} 
+                   class="flex items-center gap-2 text-sm font-semibold text-[#e94560] hover:text-white transition-colors">
+                  <i class="fa-solid fa-download text-xs"></i> Download
+                </a>
+              </div>
+              ${notes ? `<ul class="mt-3 flex flex-col gap-1">${notes.map(n => `<li class="text-dim text-sm flex gap-2"><span class="text-[#e94560] mt-0.5">·</span><span>${n}</span></li>`).join('')}</ul>` : ''}
+            </div>
+          `;
+        }).join('');
+
       } catch (e) {
         btn.href = `https://github.com/${REPO}/releases/latest`;
         btn.removeAttribute('download');
         label.textContent = 'Download di GitHub';
+        list.innerHTML = '<p class="text-dim text-sm text-center">Gagal memuat riwayat versi.</p>';
       }
     })();
   </script>
