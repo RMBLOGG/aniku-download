@@ -389,6 +389,69 @@
     </div>
   </section>
 
+  <!-- FAQ -->
+  <section class="px-6 py-24 border-t border-edge" id="faq">
+    <div class="max-w-2xl mx-auto">
+      <div class="mb-12 text-center">
+        <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">FAQ</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Pertanyaan umum.</h2>
+      </div>
+      <div class="flex flex-col gap-3" id="faq-list">
+
+        <div class="faq-item border border-edge rounded-2xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-5 py-4 text-left gap-4 hover:bg-edge/50 transition-colors">
+            <span class="font-semibold text-bone text-sm">Apakah Aniku aman diinstall?</span>
+            <i class="fa-solid fa-chevron-down text-dim text-xs shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-body hidden px-5 pb-5">
+            <p class="text-dim text-sm leading-relaxed">Ya, Aniku aman. Aplikasi ini open source dan dapat diaudit siapa saja di GitHub. Peringatan dari Google Play Protect muncul karena APK tidak didistribusikan lewat Play Store — bukan karena berbahaya. Tap <strong class="text-bone">"Tetap instal"</strong> untuk melanjutkan.</p>
+          </div>
+        </div>
+
+        <div class="faq-item border border-edge rounded-2xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-5 py-4 text-left gap-4 hover:bg-edge/50 transition-colors">
+            <span class="font-semibold text-bone text-sm">Kenapa perlu aktifkan "sumber tidak dikenal"?</span>
+            <i class="fa-solid fa-chevron-down text-dim text-xs shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-body hidden px-5 pb-5">
+            <p class="text-dim text-sm leading-relaxed">Android secara default hanya mengizinkan install aplikasi dari Google Play Store. Karena Aniku didistribusikan langsung sebagai APK, kamu perlu mengaktifkan izin ini sekali saja. Pengaturan ini bisa dinonaktifkan lagi setelah instalasi selesai.</p>
+          </div>
+        </div>
+
+        <div class="faq-item border border-edge rounded-2xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-5 py-4 text-left gap-4 hover:bg-edge/50 transition-colors">
+            <span class="font-semibold text-bone text-sm">Apakah Aniku gratis selamanya?</span>
+            <i class="fa-solid fa-chevron-down text-dim text-xs shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-body hidden px-5 pb-5">
+            <p class="text-dim text-sm leading-relaxed">Ya, Aniku 100% gratis tanpa biaya tersembunyi, langganan, atau iklan. Aplikasi ini dibuat untuk komunitas anime Indonesia. Jika ingin mendukung pengembangan, kamu bisa <a href="https://saweria.co/Dayynime" target="_blank" class="text-red hover:underline">donasi via Saweria</a>.</p>
+          </div>
+        </div>
+
+        <div class="faq-item border border-edge rounded-2xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-5 py-4 text-left gap-4 hover:bg-edge/50 transition-colors">
+            <span class="font-semibold text-bone text-sm">Bagaimana cara update ke versi terbaru?</span>
+            <i class="fa-solid fa-chevron-down text-dim text-xs shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-body hidden px-5 pb-5">
+            <p class="text-dim text-sm leading-relaxed">Aniku akan menampilkan notifikasi otomatis di dalam aplikasi saat ada versi baru. Kamu juga bisa cek halaman <a href="#changelog" class="text-red hover:underline">Changelog</a> di sini dan download versi terbaru secara manual.</p>
+          </div>
+        </div>
+
+        <div class="faq-item border border-edge rounded-2xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-5 py-4 text-left gap-4 hover:bg-edge/50 transition-colors">
+            <span class="font-semibold text-bone text-sm">Android versi berapa yang didukung?</span>
+            <i class="fa-solid fa-chevron-down text-dim text-xs shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-body hidden px-5 pb-5">
+            <p class="text-dim text-sm leading-relaxed">Aniku mendukung Android 7.0 (API 24) ke atas. Sebagian besar HP Android yang dirilis dari 2017 ke atas sudah kompatibel.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <footer class="border-t border-edge px-6 py-10">
     <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-5">
@@ -457,25 +520,6 @@
         <h3 class="text-bone font-semibold">Hubungi Kami</h3>
         <p>Pertanyaan mengenai syarat penggunaan ini dapat disampaikan melalui saluran dukungan resmi Aniku.</p>
       </div>
-    </div>
-  </div>
-
-  <!-- STICKY DOWNLOAD BAR -->
-  <div id="sticky-dl" class="fixed bottom-0 left-0 right-0 z-40 translate-y-full transition-transform duration-300 ease-in-out">
-    <div class="bg-panel/95 border-t border-edge backdrop-blur-md px-4 py-3 flex items-center justify-between gap-3 max-w-lg mx-auto">
-      <div class="flex items-center gap-3">
-        <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-8 h-8 rounded-xl" />
-        <div>
-          <p class="text-bone font-semibold text-sm">Aniku</p>
-          <p class="text-dim text-xs" id="sticky-version">Android App</p>
-        </div>
-      </div>
-      <a id="sticky-btn" href="#"
-         class="dl-btn flex items-center gap-2 text-white font-bold text-sm px-5 py-2.5 rounded-xl whitespace-nowrap"
-         download>
-        <i class="fa-solid fa-download text-xs"></i>
-        <span>Download</span>
-      </a>
     </div>
   </div>
 
@@ -577,11 +621,6 @@
 
         setDownload(btn2, label2, latestUrl, latest.tag_name, latestDl);
 
-        // Sticky bar
-        const stickyBtn = document.getElementById('sticky-btn');
-        const stickyVer = document.getElementById('sticky-version');
-        if (stickyBtn) { stickyBtn.href = latestUrl; if (latestDl) stickyBtn.setAttribute('download', ''); }
-        if (stickyVer) stickyVer.textContent = latest.tag_name;
 
         // File size
         if (latestApk && latestApk.size) {
@@ -625,6 +664,30 @@
     })();
   </script>
 
+  <!-- FAQ ACCORDION -->
+  <script>
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const body = item.querySelector('.faq-body');
+      const icon = btn.querySelector('i');
+      const isOpen = !body.classList.contains('hidden');
+
+      // Tutup semua dulu
+      document.querySelectorAll('.faq-item').forEach(el => {
+        el.querySelector('.faq-body').classList.add('hidden');
+        el.querySelector('i').classList.remove('rotate-180');
+        el.querySelector('button').classList.remove('border-b', 'border-edge');
+      });
+
+      // Toggle yang diklik
+      if (!isOpen) {
+        body.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        btn.classList.add('border-b', 'border-edge');
+      }
+    }
+  </script>
+
   <!-- OS DETECTION -->
   <script>
     (function() {
@@ -646,28 +709,6 @@
         msg.textContent = 'Kamu membuka dari PC/Mac. Download APK dan transfer ke Android kamu.';
         banner.classList.remove('hidden');
       }
-    })();
-  </script>
-
-  <!-- STICKY DOWNLOAD BAR -->
-  <script>
-    (function() {
-      const stickyBar  = document.getElementById('sticky-dl');
-      const heroSection = document.querySelector('section.hero-grid');
-      let shown = false;
-
-      const observer = new IntersectionObserver(entries => {
-        const heroVisible = entries[0].isIntersecting;
-        if (!heroVisible && !shown) {
-          stickyBar.classList.remove('translate-y-full');
-          shown = true;
-        } else if (heroVisible) {
-          stickyBar.classList.add('translate-y-full');
-          shown = false;
-        }
-      }, { threshold: 0.1 });
-
-      if (heroSection) observer.observe(heroSection);
     })();
   </script>
 
