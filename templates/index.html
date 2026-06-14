@@ -160,6 +160,14 @@
     </a>
   </div>
 
+  <!-- OS DETECTION BANNER -->
+  <div id="os-banner" class="hidden fixed bottom-0 left-0 right-0 z-50 px-4 py-3 bg-[#1a1a10] border-t border-yellow-600/40 text-center sm:hidden">
+    <p class="text-yellow-400 text-xs font-medium">
+      <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+      <span id="os-msg"></span>
+    </p>
+  </div>
+
   <!-- HERO -->
   <section class="relative min-h-screen flex flex-col items-center justify-center px-6 pt-28 pb-20 overflow-hidden hero-grid">
     <div class="absolute inset-0 hero-glow pointer-events-none"></div>
@@ -452,6 +460,25 @@
     </div>
   </div>
 
+  <!-- STICKY DOWNLOAD BAR -->
+  <div id="sticky-dl" class="fixed bottom-0 left-0 right-0 z-40 translate-y-full transition-transform duration-300 ease-in-out">
+    <div class="bg-panel/95 border-t border-edge backdrop-blur-md px-4 py-3 flex items-center justify-between gap-3 max-w-lg mx-auto">
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-8 h-8 rounded-xl" />
+        <div>
+          <p class="text-bone font-semibold text-sm">Aniku</p>
+          <p class="text-dim text-xs" id="sticky-version">Android App</p>
+        </div>
+      </div>
+      <a id="sticky-btn" href="#"
+         class="dl-btn flex items-center gap-2 text-white font-bold text-sm px-5 py-2.5 rounded-xl whitespace-nowrap"
+         download>
+        <i class="fa-solid fa-download text-xs"></i>
+        <span>Download</span>
+      </a>
+    </div>
+  </div>
+
   <!-- SCRIPTS -->
   <script>
     // Modal
@@ -538,9 +565,8 @@
           sum + r.assets.reduce((s, a) => s + (a.download_count || 0), 0), 0);
         const statEl = document.getElementById('stat-downloads');
         if (statEl) {
-          statEl.textContent = totalDl >= 1000
-            ? (totalDl / 1000).toFixed(1).replace('.0', '') + 'K'
-            : totalDl.toString();
+          statEl.dataset.target = totalDl;
+          statEl.textContent = '—'; // akan diisi counter animation
         }
 
         // Tombol utama
@@ -550,6 +576,12 @@
         const latestDl  = !!latestApk;
 
         setDownload(btn2, label2, latestUrl, latest.tag_name, latestDl);
+
+        // Sticky bar
+        const stickyBtn = document.getElementById('sticky-btn');
+        const stickyVer = document.getElementById('sticky-version');
+        if (stickyBtn) { stickyBtn.href = latestUrl; if (latestDl) stickyBtn.setAttribute('download', ''); }
+        if (stickyVer) stickyVer.textContent = latest.tag_name;
 
         // File size
         if (latestApk && latestApk.size) {
@@ -591,6 +623,85 @@
         list.innerHTML = '<p class="text-dim text-sm text-center py-8">Gagal memuat riwayat versi. <a href="' + fallback + '" class="text-red underline">Lihat di GitHub</a></p>';
       }
     })();
+  </script>
+
+  <!-- OS DETECTION -->
+  <script>
+    (function() {
+      const ua = navigator.userAgent || '';
+      const isAndroid = /android/i.test(ua);
+      const isIOS = /iphone|ipad|ipod/i.test(ua);
+      const isDesktop = !isAndroid && !isIOS;
+      const banner = document.getElementById('os-banner');
+      const msg = document.getElementById('os-msg');
+
+      if (isIOS) {
+        msg.textContent = 'Aniku hanya tersedia untuk Android. iOS tidak didukung.';
+        banner.classList.remove('hidden');
+        // dim download buttons
+        document.querySelectorAll('.dl-btn').forEach(b => {
+          b.classList.add('opacity-50', 'pointer-events-none');
+        });
+      } else if (isDesktop) {
+        msg.textContent = 'Kamu membuka dari PC/Mac. Download APK dan transfer ke Android kamu.';
+        banner.classList.remove('hidden');
+      }
+    })();
+  </script>
+
+  <!-- STICKY DOWNLOAD BAR -->
+  <script>
+    (function() {
+      const stickyBar  = document.getElementById('sticky-dl');
+      const heroSection = document.querySelector('section.hero-grid');
+      let shown = false;
+
+      const observer = new IntersectionObserver(entries => {
+        const heroVisible = entries[0].isIntersecting;
+        if (!heroVisible && !shown) {
+          stickyBar.classList.remove('translate-y-full');
+          shown = true;
+        } else if (heroVisible) {
+          stickyBar.classList.add('translate-y-full');
+          shown = false;
+        }
+      }, { threshold: 0.1 });
+
+      if (heroSection) observer.observe(heroSection);
+    })();
+  </script>
+
+  <!-- COUNTER ANIMATION -->
+  <script>
+    function animateCounter(el, target, duration) {
+      const start = performance.now();
+      const update = (now) => {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        // ease out cubic
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(ease * target);
+        el.textContent = current >= 1000
+          ? (current / 1000).toFixed(1).replace('.0', '') + 'K'
+          : current.toString();
+        if (progress < 1) requestAnimationFrame(update);
+      };
+      requestAnimationFrame(update);
+    }
+
+    // Trigger saat stats bar masuk viewport
+    const statsBar = document.querySelector('.grid.grid-cols-2');
+    if (statsBar) {
+      const obs = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+          const el = document.getElementById('stat-downloads');
+          const target = parseInt(el.dataset.target || el.textContent) || 0;
+          if (target > 0) animateCounter(el, target, 1200);
+          obs.disconnect();
+        }
+      }, { threshold: 0.5 });
+      obs.observe(statsBar);
+    }
   </script>
 
 </body>
