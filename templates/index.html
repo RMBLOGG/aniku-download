@@ -667,9 +667,10 @@
           const isNew  = i === 0;
           const size   = apk ? `${(apk.size/1024/1024).toFixed(1)} MB` : '';
           const dlCount = r.assets.reduce((s, a) => s + (a.download_count || 0), 0);
-          return `
+          const cardId = 'cl-' + r.tag_name.replace(/\./g, '-');
+        return `
 <div class="cl-card ${isNew ? 'latest' : ''}">
-  <div class="px-5 py-4 flex items-center justify-between gap-4 flex-wrap ${notes ? 'border-b border-edge' : ''}">
+  <button onclick="toggleCl('${cardId}')" class="w-full px-5 py-4 flex items-center justify-between gap-4 flex-wrap text-left hover:bg-edge/30 transition-colors">
     <div class="flex items-center gap-3 flex-wrap">
       ${isNew ? '<span class="font-mono text-xs font-bold bg-red text-white px-2.5 py-0.5 rounded-full">Terbaru</span>' : ''}
       <span class="font-mono font-bold text-bone text-sm">${r.tag_name}</span>
@@ -677,12 +678,16 @@
       ${size ? `<span class="text-dim text-xs">${size}</span>` : ''}
       <span class="flex items-center gap-1 text-dim text-xs"><i class="fa-solid fa-download text-[10px]"></i> ${dlCount.toLocaleString('id-ID')}</span>
     </div>
-    <a href="${dlUrl}" ${apk ? 'download' : 'target="_blank"'}
-       class="flex items-center gap-2 text-xs font-semibold text-red border border-red/30 hover:border-red hover:bg-redlow px-3 py-1.5 rounded-full transition-all whitespace-nowrap">
-      <i class="fa-solid fa-download text-xs"></i> Download
-    </a>
-  </div>
-  ${notes ? `<div class="px-5 py-4">${notes}</div>` : ''}
+    <div class="flex items-center gap-3 shrink-0">
+      <a href="${dlUrl}" ${apk ? 'download' : 'target="_blank"'}
+         onclick="event.stopPropagation()"
+         class="flex items-center gap-2 text-xs font-semibold text-red border border-red/30 hover:border-red hover:bg-redlow px-3 py-1.5 rounded-full transition-all whitespace-nowrap">
+        <i class="fa-solid fa-download text-xs"></i> Download
+      </a>
+      ${notes ? `<i id="icon-${cardId}" class="fa-solid fa-chevron-down text-dim text-xs transition-transform duration-300 ${isNew ? 'rotate-180' : ''}"></i>` : ''}
+    </div>
+  </button>
+  ${notes ? `<div id="${cardId}" class="${isNew ? '' : 'hidden'} border-t border-edge px-5 py-4">${notes}</div>` : ''}
 </div>`;
         }).join('');
 
@@ -693,6 +698,18 @@
         list.innerHTML = '<p class="text-dim text-sm text-center py-8">Gagal memuat riwayat versi. <a href="' + fallback + '" class="text-red underline">Lihat di GitHub</a></p>';
       }
     })();
+  </script>
+
+  <!-- CHANGELOG ACCORDION -->
+  <script>
+    function toggleCl(id) {
+      const body = document.getElementById(id);
+      const icon = document.getElementById('icon-' + id);
+      if (!body) return;
+      const isOpen = !body.classList.contains('hidden');
+      body.classList.toggle('hidden', isOpen);
+      if (icon) icon.classList.toggle('rotate-180', !isOpen);
+    }
   </script>
 
   <!-- FAQ ACCORDION -->
