@@ -196,7 +196,7 @@
 
   <!-- STATS BAR -->
   <div class="border-y border-edge bg-panel">
-    <div class="max-w-4xl mx-auto px-6 py-5 grid grid-cols-3 divide-x divide-edge text-center">
+    <div class="max-w-4xl mx-auto px-6 py-5 grid grid-cols-4 divide-x divide-edge text-center">
       <div class="px-4">
         <p class="text-white font-bold text-2xl">100%</p>
         <p class="text-dim text-xs mt-0.5">Gratis</p>
@@ -208,6 +208,10 @@
       <div class="px-4">
         <p class="text-white font-bold text-2xl">Sub ID</p>
         <p class="text-dim text-xs mt-0.5">Bahasa Indonesia</p>
+      </div>
+      <div class="px-4">
+        <p class="text-white font-bold text-2xl" id="stat-downloads">—</p>
+        <p class="text-dim text-xs mt-0.5">Downloads</p>
       </div>
     </div>
   </div>
@@ -528,6 +532,16 @@
         if (!res.ok) throw new Error('fetch failed');
         const releases = await res.json();
         if (!releases.length) throw new Error('no releases');
+
+        // Total downloads semua release
+        const totalDl = releases.reduce((sum, r) =>
+          sum + r.assets.reduce((s, a) => s + (a.download_count || 0), 0), 0);
+        const statEl = document.getElementById('stat-downloads');
+        if (statEl) {
+          statEl.textContent = totalDl >= 1000
+            ? (totalDl / 1000).toFixed(1).replace('.0', '') + 'K'
+            : totalDl.toString();
+        }
 
         // Tombol utama
         const latest = releases[0];
