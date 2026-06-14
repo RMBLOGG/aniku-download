@@ -834,18 +834,33 @@
     }
 
     async function vote(pollId, choice, pollDef) {
-      const voted = JSON.parse(localStorage.getItem('aniku_polls') || '{}');
-      if (voted[pollId]) return; // sudah vote
+      try {
+        alert('vote dipanggil: ' + pollId + ' → ' + choice);
+        const voted = JSON.parse(localStorage.getItem('aniku_polls') || '{}');
+        if (voted[pollId]) { alert('sudah vote sebelumnya'); return; }
 
-      await supaFetch('/rest/v1/polls', {
-        method: 'POST',
-        headers: { 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ poll_id: pollId, choice })
-      });
+        const res = await fetch(SUPA_URL + '/rest/v1/polls', {
+          method: 'POST',
+          headers: {
+            'apikey': SUPA_KEY,
+            'Authorization': 'Bearer ' + SUPA_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ poll_id: pollId, choice })
+        });
+        alert('insert status: ' + res.status);
 
-      voted[pollId] = choice;
-      localStorage.setItem('aniku_polls', JSON.stringify(voted));
-      renderPoll(pollDef, await fetchCounts(pollId), voted[pollId]);
+        voted[pollId] = choice;
+        localStorage.setItem('aniku_polls', JSON.stringify(voted));
+
+        const counts = await fetchCounts(pollId);
+        alert('counts: ' + JSON.stringify(counts));
+
+        renderPoll(pollDef, counts, voted[pollId]);
+      } catch(e) {
+        alert('ERROR: ' + e.message);
+      }
     }
 
     function renderPoll(poll, counts, votedChoice) {
