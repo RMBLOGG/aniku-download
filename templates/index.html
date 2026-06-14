@@ -344,51 +344,6 @@
   </section>
 
   <!-- CTA -->
-  <section class="px-6 py-24 border-t border-edge" id="download">
-    <div class="max-w-lg mx-auto text-center">
-      <div class="w-16 h-16 rounded-[24%] overflow-hidden mx-auto mb-6 ring-2 ring-red/30" style="box-shadow: 0 0 32px rgba(255,61,90,0.25)">
-        <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-full h-full object-cover" alt="Aniku" />
-      </div>
-      <h2 class="text-3xl sm:text-5xl font-bold text-white leading-tight mb-3">Mulai nonton<br />sekarang.</h2>
-      <p class="text-dim text-sm mb-8">Gratis. Tanpa kartu kredit. Tanpa iklan.</p>
-      <a id="dl-btn-2" href="#"
-         class="dl-btn inline-flex items-center gap-3 text-white font-bold text-base px-8 py-4 rounded-2xl"
-         download>
-        <i class="fa-solid fa-download"></i>
-        <span id="dl-label-2">Memuat…</span>
-      </a>
-      <p class="text-dim text-xs mt-4">Android 6.0+ · APK ~20 MB</p>
-
-      <div class="mt-8 pt-6 border-t border-edge w-full max-w-xs text-center">
-        <p class="text-dim text-xs mb-3">Suka Aniku? Traktir developer segelas kopi ☕</p>
-        <a href="https://saweria.co/Dayynime" target="_blank" rel="noopener"
-           class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-edge text-sm text-mid hover:text-bone hover:border-muted transition-all group">
-          <img src="https://saweria.co/favicon.ico" class="w-4 h-4 rounded" onerror="this.style.display='none'" />
-          Donasi via Saweria
-          <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-50 group-hover:opacity-100 transition-opacity"></i>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- CHANGELOG -->
-  <section class="px-6 py-24 border-t border-edge" id="changelog">
-    <div class="max-w-2xl mx-auto">
-      <div class="mb-12 text-center">
-        <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Changelog</span>
-        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Riwayat versi.</h2>
-        <p class="text-dim text-sm mt-2">Semua pembaruan dari waktu ke waktu.</p>
-      </div>
-      <div id="changelog-list" class="flex flex-col gap-3">
-        <div class="cl-card p-5 animate-pulse">
-          <div class="h-4 bg-edge rounded w-32 mb-3"></div>
-          <div class="h-3 bg-edge rounded w-full mb-2"></div>
-          <div class="h-3 bg-edge rounded w-4/5"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- FAQ -->
   <section class="px-6 py-24 border-t border-edge" id="faq">
     <div class="max-w-2xl mx-auto">
@@ -448,6 +403,63 @@
           </div>
         </div>
 
+      </div>
+    </div>
+  </section>
+
+  <section class="px-6 py-24 border-t border-edge" id="download">
+    <div class="max-w-lg mx-auto text-center">
+      <div class="w-16 h-16 rounded-[24%] overflow-hidden mx-auto mb-6 ring-2 ring-red/30" style="box-shadow: 0 0 32px rgba(255,61,90,0.25)">
+        <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-full h-full object-cover" alt="Aniku" />
+      </div>
+      <h2 class="text-3xl sm:text-5xl font-bold text-white leading-tight mb-3">Mulai nonton<br />sekarang.</h2>
+      <p class="text-dim text-sm mb-8">Gratis. Tanpa kartu kredit. Tanpa iklan.</p>
+      <a id="dl-btn-2" href="#"
+         class="dl-btn inline-flex items-center gap-3 text-white font-bold text-base px-8 py-4 rounded-2xl"
+         download>
+        <i class="fa-solid fa-download"></i>
+        <span id="dl-label-2">Memuat…</span>
+      </a>
+      <p class="text-dim text-xs mt-4">Android 6.0+ · APK ~20 MB</p>
+
+      <!-- Play Protect Note -->
+      <div class="mt-6 max-w-sm w-full rounded-2xl border border-yellow-600/30 bg-yellow-500/5 px-5 py-4 text-left">
+        <div class="flex items-start gap-3">
+          <i class="fa-solid fa-shield-halved text-yellow-500 mt-0.5 shrink-0"></i>
+          <div>
+            <p class="text-yellow-400 font-semibold text-sm mb-1">Muncul peringatan Google Play Protect?</p>
+            <p class="text-dim text-xs leading-relaxed">Ini normal untuk APK di luar Play Store. Play Protect memperingatkan karena belum mengenal developer Aniku — bukan karena berbahaya.</p>
+            <p class="text-xs leading-relaxed mt-2">Tap <span class="text-bone font-semibold">"Tetap instal"</span> untuk melanjutkan instalasi.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 pt-6 border-t border-edge w-full max-w-xs text-center">
+        <p class="text-dim text-xs mb-3">Suka Aniku? Traktir developer segelas kopi ☕</p>
+        <a href="https://saweria.co/Dayynime" target="_blank" rel="noopener"
+           class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-edge text-sm text-mid hover:text-bone hover:border-muted transition-all group">
+          <img src="https://saweria.co/favicon.ico" class="w-4 h-4 rounded" onerror="this.style.display='none'" />
+          Donasi via Saweria
+          <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-50 group-hover:opacity-100 transition-opacity"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHANGELOG -->
+  <section class="px-6 py-24 border-t border-edge" id="changelog">
+    <div class="max-w-2xl mx-auto">
+      <div class="mb-12 text-center">
+        <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Changelog</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Riwayat versi.</h2>
+        <p class="text-dim text-sm mt-2">Semua pembaruan dari waktu ke waktu.</p>
+      </div>
+      <div id="changelog-list" class="flex flex-col gap-3">
+        <div class="cl-card p-5 animate-pulse">
+          <div class="h-4 bg-edge rounded w-32 mb-3"></div>
+          <div class="h-3 bg-edge rounded w-full mb-2"></div>
+          <div class="h-3 bg-edge rounded w-4/5"></div>
+        </div>
       </div>
     </div>
   </section>
