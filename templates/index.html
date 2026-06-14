@@ -196,22 +196,22 @@
 
   <!-- STATS BAR -->
   <div class="border-y border-edge bg-panel">
-    <div class="max-w-4xl mx-auto px-6 py-5 grid grid-cols-4 divide-x divide-edge text-center">
-      <div class="px-4">
+    <div class="max-w-4xl mx-auto px-6 py-5 grid grid-cols-2 sm:grid-cols-4 gap-px bg-edge">
+      <div class="px-6 py-5 text-center bg-panel">
         <p class="text-white font-bold text-2xl">100%</p>
-        <p class="text-dim text-xs mt-0.5">Gratis</p>
+        <p class="text-dim text-xs mt-1">Gratis</p>
       </div>
-      <div class="px-4">
+      <div class="px-6 py-5 text-center bg-panel">
         <p class="text-white font-bold text-2xl">0</p>
-        <p class="text-dim text-xs mt-0.5">Iklan</p>
+        <p class="text-dim text-xs mt-1">Iklan</p>
       </div>
-      <div class="px-4">
+      <div class="px-6 py-5 text-center bg-panel">
         <p class="text-white font-bold text-2xl">Sub ID</p>
-        <p class="text-dim text-xs mt-0.5">Bahasa Indonesia</p>
+        <p class="text-dim text-xs mt-1">Bahasa Indonesia</p>
       </div>
-      <div class="px-4">
+      <div class="px-6 py-5 text-center bg-panel">
         <p class="text-white font-bold text-2xl" id="stat-downloads">—</p>
-        <p class="text-dim text-xs mt-0.5">Downloads</p>
+        <p class="text-dim text-xs mt-1">Downloads</p>
       </div>
     </div>
   </div>
@@ -564,6 +564,7 @@
           const notes  = renderMarkdown(r.body);
           const isNew  = i === 0;
           const size   = apk ? `${(apk.size/1024/1024).toFixed(1)} MB` : '';
+          const dlCount = r.assets.reduce((s, a) => s + (a.download_count || 0), 0);
           return `
 <div class="cl-card ${isNew ? 'latest' : ''}">
   <div class="px-5 py-4 flex items-center justify-between gap-4 flex-wrap ${notes ? 'border-b border-edge' : ''}">
@@ -572,6 +573,7 @@
       <span class="font-mono font-bold text-bone text-sm">${r.tag_name}</span>
       <span class="text-dim text-xs">${formatDate(r.published_at)}</span>
       ${size ? `<span class="text-dim text-xs">${size}</span>` : ''}
+      <span class="flex items-center gap-1 text-dim text-xs"><i class="fa-solid fa-download text-[10px]"></i> ${dlCount.toLocaleString('id-ID')}</span>
     </div>
     <a href="${dlUrl}" ${apk ? 'download' : 'target="_blank"'}
        class="flex items-center gap-2 text-xs font-semibold text-red border border-red/30 hover:border-red hover:bg-redlow px-3 py-1.5 rounded-full transition-all whitespace-nowrap">
