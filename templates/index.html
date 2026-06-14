@@ -344,6 +344,25 @@
   </section>
 
   <!-- CTA -->
+  <!-- POLL -->
+  <section class="px-6 py-24 border-t border-edge" id="poll">
+    <div class="max-w-2xl mx-auto">
+      <div class="mb-12 text-center">
+        <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Poll</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Pendapat kamu.</h2>
+        <p class="text-dim text-sm mt-2">Bantu kami dengan memilih salah satu.</p>
+      </div>
+      <div class="flex flex-col gap-6" id="poll-container">
+        <!-- dirender JS -->
+        <div class="animate-pulse flex flex-col gap-3">
+          <div class="h-5 bg-edge rounded w-48"></div>
+          <div class="h-12 bg-edge rounded-xl"></div>
+          <div class="h-12 bg-edge rounded-xl"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- FAQ -->
   <section class="px-6 py-24 border-t border-edge" id="faq">
     <div class="max-w-2xl mx-auto">
@@ -755,6 +774,148 @@
       }, { threshold: 0.5 });
       obs.observe(statsBar);
     }
+  </script>
+
+
+  <!-- SUPABASE POLL -->
+  <script>
+    const SUPA_URL = 'https://uczxaiyibnwgycodtcvm.supabase.co';
+    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjenhhaXlpYm53Z3ljb2R0Y3ZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MzYxNzAsImV4cCI6MjA5NjQxMjE3MH0.UUPfyZ4GJO6y8I5467p_piCxtyuyM5oYGX_-jPeiZRw';
+
+    const POLLS = [
+      {
+        id: 'safety',
+        question: 'Apakah Aniku aman digunakan?',
+        choices: [
+          { value: 'aman',  label: 'Aman', color: 'bg-green-500' },
+          { value: 'tidak', label: 'Tidak Aman', color: 'bg-red' },
+        ]
+      },
+      {
+        id: 'satisfaction',
+        question: 'Apakah kamu puas dengan Aniku?',
+        choices: [
+          { value: 'puas',   label: 'Puas', color: 'bg-green-500' },
+          { value: 'cukup',  label: 'Cukup', color: 'bg-yellow-500' },
+          { value: 'tidak',  label: 'Tidak Puas', color: 'bg-red' },
+        ]
+      },
+      {
+        id: 'recommend',
+        question: 'Akan merekomendasikan Aniku ke teman?',
+        choices: [
+          { value: 'ya',    label: 'Ya, pasti!', color: 'bg-green-500' },
+          { value: 'tidak', label: 'Tidak', color: 'bg-red' },
+        ]
+      },
+    ];
+
+    async function supaFetch(path, opts = {}) {
+      const res = await fetch(SUPA_URL + path, {
+        ...opts,
+        headers: {
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY,
+          'Content-Type': 'application/json',
+          ...(opts.headers || {})
+        }
+      });
+      return res.ok ? res.json() : null;
+    }
+
+    async function fetchCounts(pollId) {
+      const data = await supaFetch(
+        `/rest/v1/polls?poll_id=eq.${pollId}&select=choice`
+      );
+      if (!data) return {};
+      const counts = {};
+      data.forEach(row => { counts[row.choice] = (counts[row.choice] || 0) + 1; });
+      return counts;
+    }
+
+    async function vote(pollId, choice, pollDef) {
+      const voted = JSON.parse(localStorage.getItem('aniku_polls') || '{}');
+      if (voted[pollId]) return; // sudah vote
+
+      await supaFetch('/rest/v1/polls', {
+        method: 'POST',
+        headers: { 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ poll_id: pollId, choice })
+      });
+
+      voted[pollId] = choice;
+      localStorage.setItem('aniku_polls', JSON.stringify(voted));
+      renderPoll(pollDef, await fetchCounts(pollId), voted[pollId]);
+    }
+
+    function renderPoll(poll, counts, votedChoice) {
+      const total = Object.values(counts).reduce((s, v) => s + v, 0);
+      const hasVoted = !!votedChoice;
+
+      const el = document.getElementById('poll-' + poll.id);
+      if (!el) return;
+
+      el.innerHTML = `
+        <p class="font-semibold text-bone text-sm mb-3">${poll.question}
+          ${hasVoted ? '<span class="ml-2 text-xs text-dim font-normal">· ' + total + ' suara</span>' : ''}
+        </p>
+        <div class="flex flex-col gap-2">
+          ${poll.choices.map(c => {
+            const count = counts[c.value] || 0;
+            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+            const isVoted = votedChoice === c.value;
+
+            if (hasVoted) {
+              return `
+                <div class="relative rounded-xl border ${isVoted ? 'border-white/20' : 'border-edge'} overflow-hidden">
+                  <div class="${c.color} opacity-20 absolute inset-y-0 left-0 transition-all duration-700" style="width:${pct}%"></div>
+                  <div class="relative flex items-center justify-between px-4 py-3 gap-3">
+                    <div class="flex items-center gap-2">
+                      ${isVoted ? '<i class="fa-solid fa-check text-xs text-white"></i>' : '<span class="w-3"></span>'}
+                      <span class="text-sm ${isVoted ? 'text-bone font-semibold' : 'text-dim'}">${c.label}</span>
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                      <div class="w-20 h-1.5 bg-edge rounded-full overflow-hidden">
+                        <div class="${c.color} h-full rounded-full transition-all duration-700" style="width:${pct}%"></div>
+                      </div>
+                      <span class="text-xs text-dim w-10 text-right">${pct}% <span class="text-[10px]">(${count})</span></span>
+                    </div>
+                  </div>
+                </div>`;
+            } else {
+              return `
+                <button onclick="vote('${poll.id}','${c.value}', POLLS.find(p=>p.id==='${poll.id}'))"
+                  class="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-edge hover:border-muted hover:bg-edge/50 text-left transition-all group">
+                  <span class="w-3 h-3 rounded-full border-2 border-muted group-hover:border-bone transition-colors shrink-0"></span>
+                  <span class="text-sm text-dim group-hover:text-bone transition-colors">${c.label}</span>
+                </button>`;
+            }
+          }).join('')}
+        </div>
+      `;
+    }
+
+    async function initPolls() {
+      const container = document.getElementById('poll-container');
+      const voted = JSON.parse(localStorage.getItem('aniku_polls') || '{}');
+
+      container.innerHTML = POLLS.map(p => `
+        <div id="poll-${p.id}" class="cl-card p-5">
+          <div class="animate-pulse flex flex-col gap-2">
+            <div class="h-4 bg-edge rounded w-3/4"></div>
+            <div class="h-10 bg-edge rounded-xl"></div>
+            <div class="h-10 bg-edge rounded-xl"></div>
+          </div>
+        </div>
+      `).join('');
+
+      await Promise.all(POLLS.map(async poll => {
+        const counts = await fetchCounts(poll.id);
+        renderPoll(poll, counts, voted[poll.id]);
+      }));
+    }
+
+    initPolls();
   </script>
 
 </body>
