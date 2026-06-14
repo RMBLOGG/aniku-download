@@ -835,11 +835,10 @@
 
     async function vote(pollId, choice, pollDef) {
       try {
-        alert('vote dipanggil: ' + pollId + ' → ' + choice);
         const voted = JSON.parse(localStorage.getItem('aniku_polls') || '{}');
-        if (voted[pollId]) { alert('sudah vote sebelumnya'); return; }
+        if (voted[pollId]) return;
 
-        const res = await fetch(SUPA_URL + '/rest/v1/polls', {
+        await fetch(SUPA_URL + '/rest/v1/polls', {
           method: 'POST',
           headers: {
             'apikey': SUPA_KEY,
@@ -849,17 +848,14 @@
           },
           body: JSON.stringify({ poll_id: pollId, choice })
         });
-        alert('insert status: ' + res.status);
 
         voted[pollId] = choice;
         localStorage.setItem('aniku_polls', JSON.stringify(voted));
 
         const counts = await fetchCounts(pollId);
-        alert('counts: ' + JSON.stringify(counts));
-
         renderPoll(pollDef, counts, voted[pollId]);
       } catch(e) {
-        alert('ERROR: ' + e.message);
+        console.error('Poll error:', e);
       }
     }
 
